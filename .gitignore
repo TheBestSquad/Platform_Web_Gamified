@@ -1,0 +1,19 @@
+# Ambientes Virtuais
+.venv/
+venv/
+ENV/
+
+# PyCharm e IDEs
+.idea/
+.vscode/
+*.swp
+
+# Django
+db.sqlite3
+__pycache__/
+*.pyc
+media/
+staticfiles/
+
+# Sensível
+.env
