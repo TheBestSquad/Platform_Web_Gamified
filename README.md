@@ -19,5 +19,6 @@ Adotamos um fluxo de trabalho baseado em branches para garantir a integridade do
 
 ### 📦 Como Rodar o Projeto (Ambiente Local)
 1. Clone o repositório:
-   ```bash
-   git clone [https://github.com/SEU_USUARIO/projetoIntegrador_1.git](https://github.com/SEU_USUARIO/projetoIntegrador_1.git)
+```bash
+git clone [https://github.com/SEU_USUARIO/projetoIntegrador_1.git](https://github.com/SEU_USUARIO/projetoIntegrador_1.git)
+```
