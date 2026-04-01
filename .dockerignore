@@ -1,0 +1,38 @@
+# Git
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+build/Dockerfile
+build/docker-compose.yml
+
+# Ambientes Virtuais
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs e Editores
+.idea/
+.vscode/
+*.swp
+
+# Python e Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+
+# Arquivos Sensíveis
+.env
+
+# Frontend / React (Prevenção futura)
+node_modules/
+npm-debug.log
+build/static/
+
+# Arquivos de Sistema Operacional
+.DS_Store
+Thumbs.db
