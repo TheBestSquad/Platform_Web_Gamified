@@ -10,25 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
+import environ
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    DJANGO_ENV=(str, 'development'),
+    SECRET_KEY=(str, 'django-insecure-%%+hljgor=&v85q60%=75)k+gnw#y&%9axuf*z@k0*7s9w#6zj'),
+    ALLOWED_HOSTS=(list, ['*'])
+)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.isfile(env_file):
+    environ.Env.read_env(env_file)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%%+hljgor=&v85q60%=75)k+gnw#y&%9axuf*z@k0*7s9w#6zj'
+DJANGO_ENV = env('DJANGO_ENV')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Segurança dinâmica: DEBUG é True apenas em desenvolvimento
+DEBUG = env.bool('DEBUG', default=(DJANGO_ENV == 'development'))
 
-ALLOWED_HOSTS = []
-
-
-# Application definition
+SECRET_KEY = env('SECRET_KEY')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,20 +73,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# ------------------------------------------------------------------------
+# LÓGICA DE BANCO DE DADOS POR AMBIENTE
+# ------------------------------------------------------------------------
+if DJANGO_ENV == 'development':
+    # Força o SQLite local e ignora a DATABASE_URL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-
-
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+else:
+    # Staging e Production exigem a variável DATABASE_URL (MySQL)
+    DATABASES = {
+        'default': env.db('DATABASE_URL')
+    }
+# ------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -98,20 +106,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
