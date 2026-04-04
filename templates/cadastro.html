@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center items-center my-8">
+    <div class="bg-gray-800 text-white p-8 rounded-[3rem] border border-gray-700 w-full max-w-lg shadow-xl flex flex-col items-center">
+        
+        <h2 class="text-3xl font-extrabold mb-6 text-white">Cadastro</h2>
+        
+        <form method="post" action="{% url 'cadastro' %}" class="w-full flex flex-col gap-5">
+            {% csrf_token %}
+            
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-300 text-center">Nome completo</label>
+                <input type="text" name="nome" value="{{ nome|default:'' }}" required
+                       class="w-full bg-gray-900 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-300 text-center">Data de nascimento</label>
+                <input type="date" name="data_nascimento" value="{{ data_nascimento|default:'' }}" required
+                       class="w-full bg-gray-900 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-300 text-center">Instituição</label>
+                <input type="text" name="instituicao" value="{{ instituicao|default:'' }}" required
+                       class="w-full bg-gray-900 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-300 text-center">Email</label>
+                <input type="email" name="email" value="{{ email|default:'' }}" required
+                       class="w-full bg-gray-900 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-300 text-center">Senha</label>
+                <input type="password" name="senha" required
+                       class="w-full bg-gray-900 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-gray-300 text-center">Confirme a senha</label>
+                <input type="password" name="senha_confirmacao" required
+                       class="w-full bg-gray-900 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <button type="submit" 
+                    class="mt-4 border-[2px] border-green-500 text-green-400 font-bold rounded-lg py-2 px-10 self-center hover:bg-green-500 hover:text-white transition shadow-md">
+                Cadastrar
+            </button>
+
+            <div class="mt-2 text-center">
+                <a href="{% url 'login' %}" class="text-sm text-gray-400 hover:text-gray-200 transition">
+                    Já possui conta? Faça Login
+                </a>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+{% if erro_campo %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputComErro = document.querySelector("input[name='{{ erro_campo }}']");
+        if (inputComErro) {
+            // Define a mensagem do popup
+            inputComErro.setCustomValidity("{{ erro_mensagem }}");
+            // Dispara a exibição visual do balão no navegador
+            inputComErro.reportValidity();
+            
+            // Remove o erro assim que o usuário começar a digitar novamente
+            inputComErro.addEventListener('input', function() {
+                inputComErro.setCustomValidity('');
+            });
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

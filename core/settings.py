@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'gamification',
 ]
 
 MIDDLEWARE = [
@@ -123,4 +124,16 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 # URL para onde o usuário será enviado se tentar acessar uma página protegida sem estar logado
 LOGIN_URL = '/login/'
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# SEGURANÇA / CSRF (necessário para o Docker)
+# ------------------------------------------------------------------------
+# Necessário quando o Django roda em Docker/Proxy e as portas de origem/destino divergem
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']
+
+# ------------------------------------------------------------------------
+# MODELO DE USUÁRIO CUSTOMIZADO
+# ------------------------------------------------------------------------
+AUTH_USER_MODEL = 'gamification.CustomUser'
 # ------------------------------------------------------------------------
