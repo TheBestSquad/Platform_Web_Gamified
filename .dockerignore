@@ -4,8 +4,8 @@
 
 # Docker
 .dockerignore
-build/Dockerfile
-build/docker-compose.yml
+docker/Dockerfile
+docker/docker-compose.yml
 
 # Ambientes Virtuais
 .venv/
@@ -31,7 +31,7 @@ db.sqlite3
 # Frontend / React (Prevenção futura)
 node_modules/
 npm-debug.log
-build/static/
+static/
 
 # Arquivos de Sistema Operacional
 .DS_Store

@@ -6,9 +6,9 @@ Este projeto consiste no desenvolvimento de uma plataforma web gamificada focada
 
 ### 🛠️ Tecnologias Utilizadas
 * **Linguagem:** Python 3.12
-* **Framework Web:** Django 5.x
+* **Framework Web:** Django 6.x
 * **Frontend:** HTML5, CSS3 (Tailwind CSS), JavaScript
-* **Banco de Dados:** SQLite (Desenvolvimento)
+* **Banco de Dados:** SQLite (Desenvolvimento)/MySQL (Produção)
 * **Versionamento:** Git & GitHub
 
 ### 🚀 Estrutura de Versionamento
@@ -18,7 +18,52 @@ Adotamos um fluxo de trabalho baseado em branches para garantir a integridade do
 * `feature/*`: Desenvolvimento de requisitos específicos.
 
 ### 📦 Como Rodar o Projeto (Ambiente Local)
-1. Clone o repositório:
+Instale as dependências do sistema operacional (no Linux/WSL):
 ```bash
-git clone [https://github.com/SEU_USUARIO/projetoIntegrador_1.git](https://github.com/SEU_USUARIO/projetoIntegrador_1.git)
+sudo apt-get update && sudo apt-get install python3-dev python3-venv default-libmysqlclient-dev build-essential pkg-config
 ```
+Clone o repositório:
+```bash
+git clone https://github.com/TheBestSquad/Platform_Web_Gamified.git
+```
+Entre no diretório da aplicação:
+```bash
+cd Platform_Web_Gamified
+```
+Crie um ambiente do python isolado:
+```bash
+python3 -m venv venv
+```
+Ative o ambiente virtual (no Linux/WSL)
+```bash
+source venv/bin/activate
+```
+Instale as dependências do python3
+```bash
+pip install -r requirements.txt
+```
+Inicialize o banco de dados com o comando:
+```bash
+python manage.py migrate
+```
+Crie uma conta para administração:
+```bash
+python manage.py createsuperuser
+```
+Execute a aplicação com o comando:
+```bash
+python manage.py runserver 0.0.0.0:8080
+```
+Acesse a aplicação em:
+```bash
+http://localhost:8080/
+```
+E a interface de administração da aplicação em:
+```bash
+http://localhost:8080/admin
+```
+Para encerrar pressione CTRL+C no terminal da aplicação e para desativar o ambiente virtual do python use o comando:
+```bash
+deactivate
+```
+
