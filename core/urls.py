@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path
 # Importações para o template de login
 from django.contrib.auth import views as auth_views
-from gamification.views import home_view
+# Importações das views da app gamification
+from gamification.views import home_view, cadastro_view
 # Importações necessárias para o redirecionamento do favicon.ico
 from django.views.generic.base import RedirectView, TemplateView
 from django.conf import settings
@@ -31,6 +32,8 @@ urlpatterns = [
     ), name='login'),
     # Rota para a página principal
     path('', home_view, name='home'),
+    # Rota de cadastro
+    path('cadastro/', cadastro_view, name='cadastro'),
     # Rota para a interface de administração do Django
     path('admin/', admin.site.urls),
 
