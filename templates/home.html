@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center items-center my-4">
+    <div class="bg-gray-800 text-white p-8 rounded-[3rem] border border-gray-700 w-full max-w-5xl shadow-xl flex flex-col gap-8">
+
+        <div class="text-center">
+            <h2 class="text-3xl font-extrabold mb-2 text-white">Bem-vindo, Aluno!</h2>
+            <p class="text-gray-400">Descrição de boas-vindas, aluno, a um ambiente gamificado.</p>
+        </div>
+
+        <div class="border-[3px] border-green-500 rounded-[2rem] p-6 sm:p-10 bg-gray-800">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                {% for i in "123456789" %}
+                <div class="border border-gray-600 rounded-2xl p-5 flex flex-col items-center text-center justify-between gap-3 bg-gray-900 hover:border-gray-400 transition duration-300 shadow-md">
+                    <h3 class="font-bold text-[1.1rem] leading-tight text-white">Lista de lições por fazer</h3>
+                    <p class="text-sm text-gray-400">Lição {{ forloop.counter }}: Progresso...</p>
+                    
+                    <button class="w-full mt-2 border-[2px] border-blue-600 text-blue-400 rounded-lg py-1.5 font-semibold hover:bg-blue-600 hover:text-white transition">
+                        Começar
+                    </button>
+                </div>
+                {% endfor %}
+                
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
