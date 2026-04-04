@@ -16,7 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+# Importações necessárias para o redirecionamento do favicon.ico
+from django.views.generic.base import RedirectView, TemplateView
+from django.conf import settings
 
 urlpatterns = [
+    # Rota da página inicial apontando para o base.html
+    path('', TemplateView.as_view(template_name='base.html'), name='home'),
+
     path('admin/', admin.site.urls),
+
+    # Redireciona a busca automática do navegador pelo ícone para o diretório de estáticos (evita erro de favicon.ico not fount)
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico', permanent=True)),
 ]
