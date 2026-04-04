@@ -113,3 +113,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# ------------------------------------------------------------------------
+# CONFIGURAÇÕES DE AUTENTICAÇÃO
+# ------------------------------------------------------------------------
+# Para onde o usuário vai ao logar com sucesso
+LOGIN_REDIRECT_URL = '/'
+# Para onde o usuário vai se fizer logout
+LOGOUT_REDIRECT_URL = '/login/'
+# URL para onde o usuário será enviado se tentar acessar uma página protegida sem estar logado
+LOGIN_URL = '/login/'
+# ------------------------------------------------------------------------

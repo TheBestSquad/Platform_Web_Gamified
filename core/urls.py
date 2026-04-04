@@ -16,14 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+# Importações para o template de login
+from django.contrib.auth import views as auth_views
+from gamification.views import home_view
 # Importações necessárias para o redirecionamento do favicon.ico
 from django.views.generic.base import RedirectView, TemplateView
 from django.conf import settings
 
 urlpatterns = [
-    # Rota da página inicial apontando para o base.html
-    path('', TemplateView.as_view(template_name='base.html'), name='home'),
-
+    # Rota de login nativa do Django apontando para o template personalizado
+    path('login/', auth_views.LoginView.as_view(
+        template_name='login.html', 
+        redirect_authenticated_user=True
+    ), name='login'),
+    # Rota para a página principal
+    path('', home_view, name='home'),
+    # Rota para a interface de administração do Django
     path('admin/', admin.site.urls),
 
     # Redireciona a busca automática do navegador pelo ícone para o diretório de estáticos (evita erro de favicon.ico not fount)
