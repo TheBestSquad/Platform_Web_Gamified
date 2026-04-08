@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Postar Nova Lição{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="py-4 px-6 bg-blue-700 text-white font-bold text-xl text-center">
+        Nova Lição / Conteúdo
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="pt-4 flex gap-4">
+            <button type="submit" class="flex-grow bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition">
+                Publicar Lição
+            </button>
+            <a href="{% url 'home' %}" class="px-6 py-2 border border-gray-300 rounded text-gray-600 hover:bg-gray-50 transition text-center">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
