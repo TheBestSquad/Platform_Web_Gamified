@@ -1,45 +1,96 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex flex-col lg:flex-row gap-6 h-screen-75">
-    
+<div class="flex flex-col lg:flex-row gap-6 min-h-[75-screen]">
+
     <div class="lg:w-1/2 bg-white rounded-2xl border-4 border-slate-800 p-8 shadow-2xl overflow-y-auto">
-        <h1 class="text-2xl font-black mb-4 uppercase">{{ licao.titulo }}</h1>
-        <div class="prose max-w-none text-slate-700">
+        <h1 class="text-2xl font-black mb-4 uppercase tracking-tighter">{{ licao.titulo }}</h1>
+
+        <div class="prose max-w-none text-slate-700 mb-8">
+            <h3 class="text-sm font-black text-slate-400 uppercase mb-2">Descrição da Lição:</h3>
             {{ licao.descricao|linebreaks }}
         </div>
+
+        {# EXIBIÇÃO DAS QUESTÕES NO LADO ESQUERDO #}
+        {% if licao.questoes %}
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-xl mb-6">
+                <h3 class="text-blue-800 font-black uppercase text-xs mb-3 tracking-widest">❓ Questões para Resolver:</h3>
+                <div class="text-slate-800 font-medium">
+                    {{ licao.questoes|linebreaks }}
+                </div>
+            </div>
+        {% endif %}
+
         {% if licao.arquivo %}
             <div class="mt-6 p-4 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
                 <p class="text-sm font-bold text-slate-500 mb-2">Material de Apoio:</p>
-                <a href="{{ licao.arquivo.url }}" class="text-blue-600 font-bold underline">📎 Baixar Arquivo</a>
+                <a href="{{ licao.arquivo.url }}" target="_blank" class="text-blue-600 font-bold underline flex items-center">
+                    <span class="mr-2">📎</span> Baixar Arquivo Anexo
+                </a>
             </div>
         {% endif %}
     </div>
 
     <div class="lg:w-1/2 flex flex-col gap-4">
-        
-        <form method="POST" class="bg-white rounded-2xl border-2 border-slate-200 p-6 flex-grow shadow-sm">
-            {% csrf_token %}
-            <h3 class="font-bold text-lg mb-4 text-slate-800">Sua Resposta:</h3>
-            <textarea name="resposta" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-4 focus:border-blue-500 outline-none" rows="4" placeholder="Escreva sua explicação aqui...">{{ entrega.resposta_texto }}</textarea>
-            
-            <h3 class="font-bold text-lg mb-2 text-slate-800 font-mono">Terminal / Código:</h3>
-            <textarea name="codigo" class="w-full bg-slate-900 text-green-400 font-mono p-4 rounded-xl border-4 border-slate-800 outline-none h-48" placeholder="# Digite seu código Python aqui...">{{ entrega.codigo_enviado }}</textarea>
-            
-            <button type="submit" class="w-full mt-4 bg-blue-600 text-white font-black py-3 rounded-xl hover:scale-[1.02] transition-transform">
-                ENVIAR RESPOSTA
-            </button>
-        </form>
 
-        <div class="bg-slate-800 text-white rounded-2xl p-6 border-l-8 border-yellow-400">
-            <h3 class="font-bold text-yellow-400 mb-2">Feedback do Professor:</h3>
-            {% if entrega.feedback %}
-                <p class="italic text-slate-300">"{{ entrega.feedback }}"</p>
-                <div class="mt-4 text-2xl font-black text-right">NOTA: {{ entrega.nota }}/10</div>
-            {% else %}
-                <p class="text-slate-500 italic">Aguardando correção...</p>
-            {% endif %}
-        </div>
+        {% if perfil == 'professor' %}
+            {# PAINEL DO PROFESSOR (Sem Feedback) #}
+            <div class="bg-white rounded-2xl border-4 border-blue-600 p-8 shadow-sm flex-grow">
+                <div class="flex items-center mb-6">
+                    <div class="bg-blue-600 p-2 rounded-lg mr-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <h3 class="font-black text-xl text-slate-800 uppercase italic">Modo de Visualização</h3>
+                </div>
+
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    Você está visualizando esta lição como **Docente**. Os campos de resposta e envio de código estão desabilitados para o seu perfil.
+                </p>
+
+                <div class="space-y-4">
+                    <a href="{% url 'lista_entregas' %}" class="block text-center bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl transition shadow-lg">
+                        Ver Entregas dos Alunos
+                    </a>
+                    <a href="{% url 'home' %}" class="block text-center border-2 border-slate-200 text-slate-500 font-bold py-3 rounded-xl hover:bg-slate-50 transition">
+                        Voltar para a Dashboard
+                    </a>
+                </div>
+            </div>
+
+        {% else %}
+            {# FORMULÁRIO DO ALUNO + ÁREA DE FEEDBACK #}
+            <form method="POST" class="bg-white rounded-2xl border-2 border-slate-200 p-6 flex-grow shadow-sm">
+                {% csrf_token %}
+                <h3 class="font-bold text-lg mb-4 text-slate-800 tracking-tight">Sua Resposta:</h3>
+                <textarea name="resposta" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-4 focus:border-blue-500 outline-none transition" rows="4" placeholder="Escreva sua explicação para as questões acima...">{{ entrega.resposta_texto }}</textarea>
+
+                <h3 class="font-bold text-lg mb-2 text-slate-800 font-mono flex items-center">
+                    <span class="mr-2 text-blue-600">>_</span> Terminal / Código:
+                </h3>
+                <textarea name="codigo" class="w-full bg-slate-900 text-green-400 font-mono p-4 rounded-xl border-4 border-slate-800 outline-none h-48 shadow-inner" placeholder="# Cole ou digite seu código Python aqui...">{{ entrega.codigo_enviado }}</textarea>
+
+                <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest">
+                    ENVIAR RESPOSTA
+                </button>
+            </form>
+
+            {# ÁREA DE FEEDBACK (SÓ APARECE PARA ALUNO) #}
+            <div class="bg-slate-800 text-white rounded-2xl p-6 border-l-8 border-yellow-400 shadow-lg mt-4">
+                <h3 class="font-black text-yellow-400 mb-2 uppercase text-xs tracking-widest">Feedback do Professor:</h3>
+                {% if entrega.feedback %}
+                    <p class="italic text-slate-200 font-medium">"{{ entrega.feedback }}"</p>
+                    <div class="mt-4 flex justify-end items-baseline gap-2">
+                        <span class="text-xs text-slate-400 font-bold uppercase">Nota atribuída:</span>
+                        <span class="text-3xl font-black text-yellow-400">{{ entrega.nota }}<span class="text-sm">/10</span></span>
+                    </div>
+                {% else %}
+                    <div class="flex items-center text-slate-500 italic">
+                        <svg class="w-4 h-4 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+                        Aguardando correção do docente...
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

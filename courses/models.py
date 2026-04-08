@@ -6,6 +6,7 @@ class Licao(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE, related_name='licoes')
     titulo = models.CharField(max_length=200)
     descricao = models.TextField()
+    questoes = models.TextField(verbose_name="Questões da Lição", blank=True, null=True)
     link_externo = models.URLField(blank=True, null=True)
     arquivo = models.FileField(upload_to='materiais/', blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)

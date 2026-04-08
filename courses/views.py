@@ -28,6 +28,7 @@ def criar_licao(request):
 def detalhe_licao(request, licao_id):
     licao = get_object_or_404(Licao, id=licao_id)
     entrega = None
+    perfil = 'aluno' if hasattr(request.user, 'aluno_profile') else 'professor'
 
     # 1. Se for Aluno, busca (ou salva) a entrega
     if hasattr(request.user, 'aluno_profile'):
@@ -60,7 +61,8 @@ def detalhe_licao(request, licao_id):
 
     return render(request, 'courses/detalhe_licao.html', {
         'licao': licao,
-        'entrega': entrega
+        'entrega': entrega,
+        'perfil': perfil,
     })
 
 
