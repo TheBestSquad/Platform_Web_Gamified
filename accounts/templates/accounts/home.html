@@ -72,11 +72,17 @@
                             </span>
                             <span class="text-gray-400 text-xs">{{ licao.data_criacao|date:"d M" }}</span>
                         </div>
-                        <h4 class="text-lg font-bold text-slate-800 mb-2 leading-tight">{{ licao.titulo }}</h4>
+                        <a href="{% url 'detalhe_licao' licao.id %}" class="hover:text-blue-600 transition">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2 leading-tight">{{ licao.titulo }}</h4>
+                        </a>
                         <p class="text-gray-500 text-sm mb-4 line-clamp-3">{{ licao.descricao }}</p>
                     </div>
 
                     <div class="space-y-2 mt-4">
+                        <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                            🚀 Abrir Lição e Responder
+                        </a>
+
                         {% if licao.arquivo %}
                             <a href="{{ licao.arquivo.url }}" target="_blank" class="flex items-center justify-center w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg text-xs transition border border-slate-200">
                                 📂 Baixar Material

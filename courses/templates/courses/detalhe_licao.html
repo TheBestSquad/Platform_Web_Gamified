@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-6 h-screen-75">
+    
+    <div class="lg:w-1/2 bg-white rounded-2xl border-4 border-slate-800 p-8 shadow-2xl overflow-y-auto">
+        <h1 class="text-2xl font-black mb-4 uppercase">{{ licao.titulo }}</h1>
+        <div class="prose max-w-none text-slate-700">
+            {{ licao.descricao|linebreaks }}
+        </div>
+        {% if licao.arquivo %}
+            <div class="mt-6 p-4 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
+                <p class="text-sm font-bold text-slate-500 mb-2">Material de Apoio:</p>
+                <a href="{{ licao.arquivo.url }}" class="text-blue-600 font-bold underline">📎 Baixar Arquivo</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="lg:w-1/2 flex flex-col gap-4">
+        
+        <form method="POST" class="bg-white rounded-2xl border-2 border-slate-200 p-6 flex-grow shadow-sm">
+            {% csrf_token %}
+            <h3 class="font-bold text-lg mb-4 text-slate-800">Sua Resposta:</h3>
+            <textarea name="resposta" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-4 focus:border-blue-500 outline-none" rows="4" placeholder="Escreva sua explicação aqui...">{{ entrega.resposta_texto }}</textarea>
+            
+            <h3 class="font-bold text-lg mb-2 text-slate-800 font-mono">Terminal / Código:</h3>
+            <textarea name="codigo" class="w-full bg-slate-900 text-green-400 font-mono p-4 rounded-xl border-4 border-slate-800 outline-none h-48" placeholder="# Digite seu código Python aqui...">{{ entrega.codigo_enviado }}</textarea>
+            
+            <button type="submit" class="w-full mt-4 bg-blue-600 text-white font-black py-3 rounded-xl hover:scale-[1.02] transition-transform">
+                ENVIAR RESPOSTA
+            </button>
+        </form>
+
+        <div class="bg-slate-800 text-white rounded-2xl p-6 border-l-8 border-yellow-400">
+            <h3 class="font-bold text-yellow-400 mb-2">Feedback do Professor:</h3>
+            {% if entrega.feedback %}
+                <p class="italic text-slate-300">"{{ entrega.feedback }}"</p>
+                <div class="mt-4 text-2xl font-black text-right">NOTA: {{ entrega.nota }}/10</div>
+            {% else %}
+                <p class="text-slate-500 italic">Aguardando correção...</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
