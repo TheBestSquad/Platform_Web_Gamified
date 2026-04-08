@@ -17,6 +17,7 @@
         <ul>
             {% for aluno in alunos_pendentes %}
                 <li>{{ aluno.user.get_full_name }} ({{ aluno.user.email }})</li>
+                <a href="{% url 'aprovar_aluno' aluno.id %}" style="color: blue; margin-left: 15px;">[Aprovar Aluno]</a>
             {% empty %}
                 <li>Nenhum aluno pendente.</li>
             {% endfor %}
