@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from .models import Professor, Aluno
+from courses.models import Licao
 
 
 def register_professor(request):
@@ -55,13 +56,14 @@ def home(request):
     # Verifica se o usuário logado é um Professor
     if hasattr(request.user, 'professor_profile'):
         professor = request.user.professor_profile
-
+        licoes = Licao.objects.filter(professor=professor).order_by('-data_criacao')
         alunos_pendentes = Aluno.objects.filter(professor=professor, is_approved=False)
         alunos_aprovados = Aluno.objects.filter(professor=professor, is_approved=True)
 
         context = {
             'perfil': 'professor',
             'professor': professor,
+            'licoes': licoes,
             'alunos_pendentes': alunos_pendentes,
             'alunos_aprovados': alunos_aprovados
         }
@@ -69,9 +71,14 @@ def home(request):
     elif hasattr(request.user, 'aluno_profile'):
         aluno = request.user.aluno_profile
 
+        licoes = []
+        if aluno.is_approved:
+            licoes = Licao.objects.filter(professor=aluno.professor).order_by('-data_criacao')
+
         context = {
             'perfil': 'aluno',
             'aluno': aluno,
+            'licoes': licoes,
             'aprovado': aluno.is_approved
         }
     else:
