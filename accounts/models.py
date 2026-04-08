@@ -17,7 +17,7 @@ class Aluno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='aluno_profile')
     contato = models.CharField(max_length=20)
     # Aqui o aluno escolhe o professor no cadastro
-    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, null=True, related_name='meus_alunos')
+    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, null=True, related_name='alunos')
     # Status para aprovação manual do professor
     is_approved = models.BooleanField(default=False)
 
