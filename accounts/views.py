@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import ProfessorRegistrationForm, AlunoRegistrationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 from .models import Professor, Aluno
 
 
@@ -78,3 +79,20 @@ def home(request):
         context = {'perfil': 'admin'}
 
     return render(request, 'accounts/home.html', context)
+
+
+@login_required
+def aprovar_aluno(request, aluno_id):
+    # Segurança: Só professor pode acessar essa rota
+    if not hasattr(request.user, 'professor_profile'):
+        return redirect('home')
+
+    # Busca o aluno ou retorna 404 se o ID for inválido
+    aluno = get_object_or_404(Aluno, id=aluno_id)
+
+    # Segurança: O professor só pode aprovar quem é aluno DELE
+    if aluno.professor == request.user.professor_profile:
+        aluno.is_approved = True
+        aluno.save()
+
+    return redirect('home')
