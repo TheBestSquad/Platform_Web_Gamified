@@ -11,6 +11,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     # Adiciona as rotas padrão do Django (login, logout, password_reset)
     path('accounts/', include('django.contrib.auth.urls')),
+    path('courses/', include('courses.urls')),
 ]
 
 if settings.DEBUG:
