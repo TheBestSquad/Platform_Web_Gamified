@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import ProfessorRegistrationForm, AlunoRegistrationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .models import Professor, Aluno
 
 
@@ -46,3 +47,34 @@ def register_aluno(request):
         form = AlunoRegistrationForm()
         
     return render(request, 'accounts/register_aluno.html', {'form': form})
+
+
+@login_required
+def home(request):
+    # Verifica se o usuário logado é um Professor
+    if hasattr(request.user, 'professor_profile'):
+        professor = request.user.professor_profile
+
+        alunos_pendentes = Aluno.objects.filter(professor=professor, is_approved=False)
+        alunos_aprovados = Aluno.objects.filter(professor=professor, is_approved=True)
+
+        context = {
+            'perfil': 'professor',
+            'professor': professor,
+            'alunos_pendentes': alunos_pendentes,
+            'alunos_aprovados': alunos_aprovados
+        }
+    # Verifica se o usuário logado é um Aluno
+    elif hasattr(request.user, 'aluno_profile'):
+        aluno = request.user.aluno_profile
+
+        context = {
+            'perfil': 'aluno',
+            'aluno': aluno,
+            'aprovado': aluno.is_approved
+        }
+    else:
+        # Caso seja um Superuser que não é nem prof nem aluno
+        context = {'perfil': 'admin'}
+
+    return render(request, 'accounts/home.html', context)
