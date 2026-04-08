@@ -29,22 +29,63 @@ def detalhe_licao(request, licao_id):
     licao = get_object_or_404(Licao, id=licao_id)
     entrega = None
 
+    # 1. Se for Aluno, busca (ou salva) a entrega
     if hasattr(request.user, 'aluno_profile'):
-        entrega = Entrega.objects.filter(licao=licao, aluno=request.user.aluno_profile).first()
+        aluno = request.user.aluno_profile
+        entrega = Entrega.objects.filter(licao=licao, aluno=aluno).first()
 
         if request.method == 'POST':
-            # Lógica para salvar a resposta do aluno
             resposta = request.POST.get('resposta')
             codigo = request.POST.get('codigo')
 
+            # Salva ou atualiza a resposta
             Entrega.objects.update_or_create(
                 licao=licao,
-                aluno=request.user.aluno_profile,
+                aluno=aluno,
                 defaults={'resposta_texto': resposta, 'codigo_enviado': codigo}
             )
-        return redirect('detalhe_licao', licao_id=licao.id)
+            # Redireciona para a PRÓPRIA página para evitar reenvio de formulário no F5
+            return redirect('detalhe_licao', licao_id=licao.id)
+
+    # 2. Se for Professor, ele apenas visualiza (não entra no POST de aluno)
+    elif hasattr(request.user, 'professor_profile'):
+        # Professor pode querer ver a entrega de um aluno específico futuramente,
+        # mas por enquanto ele só vê a lição "seca" ou a entrega via admin.
+        pass
+
+    # 3. Se não for nenhum dos dois perfis (ex: Superuser), manda para a home real
+    else:
+        # Verifique se o nome da sua URL da home é realmente 'home' no core/urls.py
+        return redirect('home')
 
     return render(request, 'courses/detalhe_licao.html', {
         'licao': licao,
         'entrega': entrega
     })
+
+
+@login_required
+def lista_entregas(request):
+    if not hasattr(request.user, 'professor_profile'):
+        return redirect('home')
+
+    # Busca todas as entregas feitas para as lições deste professor
+    entregas = Entrega.objects.filter(licao__professor=request.user.professor_profile).order_by('-data_entrega')
+
+    return render(request, 'courses/lista_entregas.html', {'entregas': entregas})
+
+
+@login_required
+def dar_feedback(request, entrega_id):
+    if not hasattr(request.user, 'professor_profile'):
+        return redirect('home')
+
+    entrega = get_object_or_404(Entrega, id=entrega_id, licao__professor=request.user.professor_profile)
+
+    if request.method == 'POST':
+        entrega.feedback = request.POST.get('feedback')
+        entrega.nota = request.POST.get('nota')
+        entrega.save()
+        return redirect('lista_entregas')
+
+    return render(request, 'courses/dar_feedback.html', {'entrega': entrega})
