@@ -1,15 +1,68 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Cadastro de Aluno</title>
-</head>
-<body>
-    <h2>Cadastro de Professor</h2>
-    <form method="POST">
+{% extends 'base.html' %}
+
+{% block title %}Cadastro de Aluno{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="py-4 px-6 bg-blue-500 text-white text-center font-bold text-xl">
+        Cadastro de Aluno
+    </div>
+
+    <form method="POST" class="p-6 space-y-4">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Finalizar Cadastro</button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Nome Completo</label>
+                <input type="text" name="first_name" required
+                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">E-mail</label>
+                <input type="email" name="email" required
+                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Contato (WhatsApp)</label>
+                <input type="text" name="contato" required
+                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Selecione seu Professor</label>
+                <select name="professor" required
+                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white transition">
+                    <option value="" disabled selected>Escolha um professor na lista</option>
+                    {% for choice in form.professor.field.queryset %}
+                        <option value="{{ choice.pk }}">{{ choice.user.get_full_name }} ({{ choice.disciplina_curso }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Senha</label>
+                <input type="password" name="password" required
+                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Confirmar Senha</label>
+                <input type="password" name="confirm_password" required
+                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+        </div>
+
+        <button type="submit"
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
+            Finalizar Cadastro de Aluno
+        </button>
     </form>
-</body>
-</html>
+
+    <div class="bg-gray-50 py-3 text-center border-t">
+        <a href="{% url 'login' %}" class="text-sm text-blue-600 hover:underline">Já tem uma conta? Faça login</a>
+    </div>
+</div>
+{% endblock %}
