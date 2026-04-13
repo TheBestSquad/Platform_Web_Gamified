@@ -58,23 +58,41 @@
             </div>
 
         {% else %}
-            {# FORMULÁRIO DO ALUNO + ÁREA DE FEEDBACK #}
+            {# FORMULÁRIO DO ALUNO (COM TRAVA SE JÁ ENTREGUE) #}
             <form method="POST" class="bg-white rounded-2xl border-2 border-slate-200 p-6 flex-grow shadow-sm">
                 {% csrf_token %}
-                <h3 class="font-bold text-lg mb-4 text-slate-800 tracking-tight">Sua Resposta:</h3>
-                <textarea name="resposta" class="w-full border-2 border-slate-100 rounded-xl p-4 mb-4 focus:border-blue-500 outline-none transition" rows="4" placeholder="Escreva sua explicação para as questões acima...">{{ entrega.resposta_texto }}</textarea>
+                <h3 class="font-bold text-lg mb-4 text-slate-800 tracking-tight">
+                    {% if entrega %} Sua Resposta Enviada: {% else %} Sua Resposta: {% endif %}
+                </h3>
+
+                <textarea name="resposta"
+                    class="w-full border-2 border-slate-100 rounded-xl p-4 mb-4 outline-none transition {% if entrega %} bg-slate-50 text-slate-500 cursor-not-allowed {% else %} focus:border-blue-500 {% endif %}"
+                    rows="4"
+                    {% if entrega %} readonly {% endif %}
+                    placeholder="Escreva sua explicação para as questões acima...">{{ entrega.resposta_texto }}</textarea>
 
                 <h3 class="font-bold text-lg mb-2 text-slate-800 font-mono flex items-center">
                     <span class="mr-2 text-blue-600">>_</span> Terminal / Código:
                 </h3>
-                <textarea name="codigo" class="w-full bg-slate-900 text-green-400 font-mono p-4 rounded-xl border-4 border-slate-800 outline-none h-48 shadow-inner" placeholder="# Cole ou digite seu código Python aqui...">{{ entrega.codigo_enviado }}</textarea>
 
-                <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest">
-                    ENVIAR RESPOSTA
-                </button>
+                <textarea name="codigo"
+                    class="w-full bg-slate-900 text-green-400 font-mono p-4 rounded-xl border-4 border-slate-800 outline-none h-48 shadow-inner {% if entrega %} cursor-not-allowed opacity-80 {% endif %}"
+                    {% if entrega %} readonly {% endif %}
+                    placeholder="# Cole ou digite seu código Python aqui...">{{ entrega.codigo_enviado }}</textarea>
+
+                {% if not entrega %}
+                    <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest">
+                        ENVIAR RESPOSTA
+                    </button>
+                {% else %}
+                    <div class="mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center justify-center gap-3">
+                        <span class="text-green-600 text-xl font-bold">✓</span>
+                        <span class="text-green-800 font-black text-xs uppercase tracking-widest">Atividade entregue e bloqueada</span>
+                    </div>
+                {% endif %}
             </form>
 
-            {# ÁREA DE FEEDBACK (SÓ APARECE PARA ALUNO) #}
+            {# ÁREA DE FEEDBACK (SÓ PARA ALUNO) #}
             <div class="bg-slate-800 text-white rounded-2xl p-6 border-l-8 border-yellow-400 shadow-lg mt-4">
                 <h3 class="font-black text-yellow-400 mb-2 uppercase text-xs tracking-widest">Feedback do Professor:</h3>
                 {% if entrega.feedback %}
