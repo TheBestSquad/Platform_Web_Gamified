@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db.models import Sum
 from .forms import LicaoForm
 from .models import Licao, Entrega
@@ -19,6 +20,7 @@ def criar_licao(request):
             licao = form.save(commit=False)
             licao.professor = request.user.professor_profile
             licao.save()
+            messages.success(request, 'Lição publicada com sucesso! 🚀')
             return redirect('home')
     else:
         form = LicaoForm()
@@ -38,6 +40,9 @@ def detalhe_licao(request, licao_id):
         entrega = Entrega.objects.filter(licao=licao, aluno=aluno).first()
 
         if request.method == 'POST':
+            if entrega:
+                return redirect('detalhe_licao', licao_id=licao.id)
+
             resposta = request.POST.get('resposta')
             codigo = request.POST.get('codigo')
 
@@ -45,10 +50,12 @@ def detalhe_licao(request, licao_id):
             Entrega.objects.update_or_create(
                 licao=licao,
                 aluno=aluno,
-                defaults={'resposta_texto': resposta, 'codigo_enviado': codigo}
+                resposta_texto=resposta,
+                codigo_enviado=codigo,
             )
             # Redireciona para a PRÓPRIA página para evitar reenvio de formulário no F5
-            return redirect('detalhe_licao', licao_id=licao.id)
+            messages.success(request, 'Sua resposta foi enviada com sucesso! Agora é só aguardar a correção. 😉')
+            return redirect('home')
 
     # 2. Se for Professor, ele apenas visualiza (não entra no POST de aluno)
     elif hasattr(request.user, 'professor_profile'):
