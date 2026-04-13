@@ -88,15 +88,22 @@
                     </div>
 
                     <div class="space-y-2 mt-4">
-                        {# LÓGICA DIFERENCIADA POR PERFIL #}
+                        {# LÓGICA REFINADA POR PERFIL E STATUS DE ENTREGA #}
                         {% if perfil == 'professor' %}
                             <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-slate-800 hover:bg-black text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
                                 👁️ Visualizar Lição
                             </a>
                         {% else %}
-                            <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
-                                🚀 Abrir Lição e Responder
-                            </a>
+                            {# VERIFICA SE O ID DA LIÇÃO ESTÁ NA LISTA DE ENTREGAS DO ALUNO #}
+                            {% if licao.id in entregas_feitas %}
+                                <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                                    ✅ Ver Nota e Feedback
+                                </a>
+                            {% else %}
+                                <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                                    🚀 Abrir Lição e Responder
+                                </a>
+                            {% endif %}
                         {% endif %}
 
                         {% if licao.arquivo %}

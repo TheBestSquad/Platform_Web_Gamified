@@ -72,13 +72,18 @@ def home(request):
         aluno = request.user.aluno_profile
 
         licoes = []
+        entregas_feitas = []
         if aluno.is_approved:
             licoes = Licao.objects.filter(professor=aluno.professor).order_by('-data_criacao')
+
+            from courses.models import Entrega
+            entregas_feitas = Entrega.objects.filter(aluno=aluno).values_list('licao_id', flat=True)
 
         context = {
             'perfil': 'aluno',
             'aluno': aluno,
             'licoes': licoes,
+            'entregas_feitas': entregas_feitas,
             'aprovado': aluno.is_approved
         }
     else:
