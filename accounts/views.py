@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import ProfessorRegistrationForm, AlunoRegistrationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from .models import Professor, Aluno
 from courses.models import Licao
@@ -106,5 +107,8 @@ def aprovar_aluno(request, aluno_id):
     if aluno.professor == request.user.professor_profile:
         aluno.is_approved = True
         aluno.save()
+        messages.success(request, f'O aluno {aluno.user.get_full_name()} foi aprovado e já pode acessar as lições!')
+    else:
+        messages.error(request, 'Você não tem permissão para aprovar este aluno.')
 
     return redirect('home')
