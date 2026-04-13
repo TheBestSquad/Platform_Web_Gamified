@@ -3,6 +3,7 @@ from .forms import ProfessorRegistrationForm, AlunoRegistrationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from .models import Professor, Aluno
 from courses.models import Licao
@@ -112,3 +113,22 @@ def aprovar_aluno(request, aluno_id):
         messages.error(request, 'Você não tem permissão para aprovar este aluno.')
 
     return redirect('home')
+
+
+@login_required
+def lista_alunos_professor(request):
+    # Segurança: Só professor acessa
+    if not hasattr(request.user, 'professor_profile'):
+        return redirect('home')
+
+    professor = request.user.professor_profile
+
+    # Buscamos os alunos aprovados do professor e calculamos a média
+    alunos = Aluno.objects.filter(
+        professor=professor,
+        is_approved=True
+    ).annotate(
+        media_notas=Avg('minhas_entregas__nota')
+    ).order_by('user__first_name')
+
+    return render(request, 'accounts/lista_alunos.html', {'alunos': alunos})

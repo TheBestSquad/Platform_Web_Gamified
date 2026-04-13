@@ -11,6 +11,9 @@
                 </a>
 
                 {% if user.professor_profile %}
+                    <a href="{% url 'lista_alunos' %}" class="hover:bg-blue-700 px-3 py-1 rounded text-sm transition border border-blue-400">
+                        Meus Alunos
+                    </a>
                     <a href="{% url 'lista_entregas' %}" class="hover:bg-blue-700 px-3 py-1 rounded text-sm transition border border-blue-400">
                         Minhas Correções
                     </a>
