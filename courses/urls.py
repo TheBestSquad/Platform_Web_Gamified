@@ -6,4 +6,5 @@ urlpatterns = [
     path('licao/<int:licao_id>/', views.detalhe_licao, name='detalhe_licao'),
     path('entregas/', views.lista_entregas, name='lista_entregas'),
     path('corrigir/<int:entrega_id>/', views.dar_feedback, name='dar_feedback'),
+    path('ranking/', views.ranking, name='ranking'),
 ]

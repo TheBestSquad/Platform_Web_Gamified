@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from .forms import LicaoForm
 from .models import Licao, Entrega
+from accounts.models import Aluno
 
 
 @login_required
@@ -91,3 +93,14 @@ def dar_feedback(request, entrega_id):
         return redirect('lista_entregas')
 
     return render(request, 'courses/dar_feedback.html', {'entrega': entrega})
+
+
+@login_required
+def ranking(request):
+    # Pegamos todos os alunos, somamos as notas das suas entregas
+    # e ordenamos do maior para o menor.
+    ranking_list = Aluno.objects.annotate(
+        pontos_totais=Sum('minhas_entregas__nota')
+    ).filter(pontos_totais__isnull=False).order_by('-pontos_totais')
+
+    return render(request, 'courses/ranking.html', {'ranking': ranking_list})
