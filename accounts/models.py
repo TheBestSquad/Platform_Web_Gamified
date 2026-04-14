@@ -8,6 +8,7 @@ class Professor(models.Model):
     formacao = models.CharField(max_length=255)
     contato = models.CharField(max_length=100)
     disciplina_curso = models.CharField(max_length=255)
+    foto = models.ImageField(upload_to='perfil_fotos/', null=True, blank=True)
 
     def __str__(self):
         return f'Professor {self.user.first_name} {self.user.last_name} - {self.disciplina_curso}'
@@ -20,6 +21,7 @@ class Aluno(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, null=True, related_name='alunos')
     # Status para aprovação manual do professor
     is_approved = models.BooleanField(default=False)
+    foto = models.ImageField(upload_to='perfil_fotos/', null=True, blank=True)
 
     def __str__(self):
         return self.user.get_full_name()

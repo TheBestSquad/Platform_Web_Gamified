@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Professor, Aluno
 
+
 class ProfessorRegistrationForm(forms.ModelForm):
     # Campos do User
     first_name = forms.CharField(label="Nome Completo", max_length=150)
@@ -11,7 +12,7 @@ class ProfessorRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Professor
-        fields = ['formacao', 'contato', 'disciplina_curso']
+        fields = ['formacao', 'contato', 'disciplina_curso', 'foto']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -39,7 +40,7 @@ class AlunoRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Aluno
-        fields = ['contato', 'professor']
+        fields = ['contato', 'professor', 'foto']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -49,3 +50,22 @@ class AlunoRegistrationForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError("As senhas não coincidem!")
         return cleaned_data
+
+
+# Formulário para dados básicos do User
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+# Formulário para dados extras do Professor
+class ProfessorUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Professor
+        fields = ['formacao', 'contato', 'disciplina_curso', 'foto']
+
+# Formulário para dados extras do Aluno
+class AlunoUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Aluno
+        fields = ['contato', 'foto']
