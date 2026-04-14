@@ -32,12 +32,13 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    {% for aluno in alunos_pendentes %}
+                    {# AJUSTADO: Agora percorremos as matriculas para acessar o aluno #}
+                    {% for matricula in matriculas_pendentes %}
                     <tr>
-                        <td class="px-6 py-4">{{ aluno.user.get_full_name }}</td>
-                        <td class="px-6 py-4 text-gray-500">{{ aluno.user.email }}</td>
+                        <td class="px-6 py-4">{{ matricula.aluno.user.get_full_name }}</td>
+                        <td class="px-6 py-4 text-gray-500">{{ matricula.aluno.user.email }}</td>
                         <td class="px-6 py-4 text-center">
-                            <a href="{% url 'aprovar_aluno' aluno.id %}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm font-bold transition">Aprovar</a>
+                            <a href="{% url 'aprovar_aluno' matricula.aluno.id %}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm font-bold transition">Aprovar</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -50,82 +51,89 @@
         </div>
 
     {% elif perfil == 'aluno' %}
-        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-10">
-            <h2 class="text-xl font-semibold text-blue-800 mb-2">Painel do Aluno</h2>
-            {% if aprovado %}
-                <div class="flex items-center text-green-700">
-                    <span class="mr-2">✅</span> Sua conta está ativa com o Prof. {{ aluno.professor.user.first_name }}.
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-10">
+            <h2 class="text-xl font-black text-blue-800 mb-4 uppercase tracking-tighter">Status das Matérias</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for matricula in aluno.matricula_set.all %}
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-blue-100 shadow-sm">
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">{{ matricula.professor.disciplina_curso }}</p>
+                        <p class="text-[10px] text-slate-400">Prof. {{ matricula.professor.user.first_name }}</p>
+                    </div>
+                    {% if matricula.is_approved %}
+                        <span class="text-green-600 font-bold text-xs flex items-center bg-green-50 px-2 py-1 rounded-lg">✅ Ativo</span>
+                    {% else %}
+                        <span class="text-amber-600 font-bold text-xs flex items-center bg-amber-50 px-2 py-1 rounded-lg">⏳ Pendente</span>
+                    {% endif %}
                 </div>
-            {% else %}
-                <div class="flex items-center text-amber-700 font-medium">
-                    <span class="mr-2">⏳</span> Aguardando aprovação do Prof. {{ aluno.professor.user.first_name }}.
-                </div>
-            {% endif %}
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
 
-    {% if perfil == 'professor' or aprovado %}
-        <hr class="my-10 border-gray-100">
+    {# MURAL DE LIÇÕES ORGANIZADO #}
+    {% if perfil == 'professor' %}
         <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
             <span class="w-2 h-8 bg-blue-600 rounded mr-3"></span>
-            Mural de Lições
+            Minhas Lições Postadas
         </h3>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for licao in licoes %}
-                <div class="bg-white border-2 border-slate-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">
-                                {{ licao.professor.disciplina_curso }}
-                            </span>
-                            <span class="text-gray-400 text-xs">{{ licao.data_criacao|date:"d M" }}</span>
-                        </div>
-                        <a href="{% url 'detalhe_licao' licao.id %}" class="hover:text-blue-600 transition">
-                            <h4 class="text-lg font-bold text-slate-800 mb-2 leading-tight">{{ licao.titulo }}</h4>
-                        </a>
-                        <p class="text-gray-500 text-sm mb-4 line-clamp-3">{{ licao.descricao }}</p>
-                    </div>
-
-                    <div class="space-y-2 mt-4">
-                        {# LÓGICA REFINADA POR PERFIL E STATUS DE ENTREGA #}
-                        {% if perfil == 'professor' %}
-                            <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-slate-800 hover:bg-black text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
-                                👁️ Visualizar Lição
-                            </a>
-                        {% else %}
-                            {# VERIFICA SE O ID DA LIÇÃO ESTÁ NA LISTA DE ENTREGAS DO ALUNO #}
-                            {% if licao.id in entregas_feitas %}
-                                <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
-                                    ✅ Ver Nota e Feedback
-                                </a>
-                            {% else %}
-                                <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
-                                    🚀 Abrir Lição e Responder
-                                </a>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if licao.arquivo %}
-                            <a href="{{ licao.arquivo.url }}" target="_blank" class="flex items-center justify-center w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg text-xs transition border border-slate-200">
-                                📂 Baixar Material
-                            </a>
-                        {% endif %}
-
-                        {% if licao.link_externo %}
-                            <a href="{{ licao.link_externo }}" target="_blank" class="flex items-center justify-center w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold py-2 px-4 rounded-lg text-xs transition border border-blue-100">
-                                🔗 Ver Link Externo
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
+                {% include 'partials/_card_licao.html' %}
             {% empty %}
-                <div class="col-span-full py-16 text-center border-2 border-dashed border-gray-100 rounded-xl">
-                    <div class="text-4xl mb-3">📂</div>
-                    <p class="text-gray-400 font-medium">Nenhum material postado ainda.</p>
-                </div>
+                <p class="text-gray-400 italic">Você ainda não postou nenhuma lição.</p>
             {% endfor %}
         </div>
+
+    {% elif perfil == 'aluno' %}
+        {# Lógica de exibição por matéria para o aluno #}
+        {% for professor, licoes in licoes_por_professor.items %}
+            <div class="mb-12">
+                <h3 class="text-2xl font-black text-slate-800 mb-6 flex items-center italic uppercase tracking-tighter">
+                    <span class="w-2 h-8 bg-blue-600 rounded-full mr-3 shadow-lg"></span>
+                    {{ professor.disciplina_curso }}
+                    <span class="ml-3 text-sm font-medium text-slate-400 normal-case italic tracking-normal">
+                        (Prof. {{ professor.user.first_name }})
+                    </span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for licao in licoes %}
+                        {# Card de Lição (o código que você já tinha) #}
+                        <div class="bg-white border-2 border-slate-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">
+                                        {{ licao.professor.disciplina_curso }}
+                                    </span>
+                                    <span class="text-gray-400 text-xs">{{ licao.data_criacao|date:"d M" }}</span>
+                                </div>
+                                <a href="{% url 'detalhe_licao' licao.id %}" class="hover:text-blue-600 transition">
+                                    <h4 class="text-lg font-bold text-slate-800 mb-2 leading-tight">{{ licao.titulo }}</h4>
+                                </a>
+                                <p class="text-gray-500 text-sm mb-4 line-clamp-3">{{ licao.descricao }}</p>
+                            </div>
+
+                            <div class="space-y-2 mt-4">
+                                {% if licao.id in entregas_feitas %}
+                                    <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                                        ✅ Ver Nota e Feedback
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                                        🚀 Abrir Lição e Responder
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                <p class="text-slate-400 font-bold italic">Nenhuma lição disponível nas matérias em que você está aprovado. 🚀</p>
+            </div>
+        {% endfor %}
     {% endif %}
 </div>
 {% endblock %}

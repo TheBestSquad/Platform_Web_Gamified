@@ -20,31 +20,29 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                {% for aluno in alunos %}
+                {% for matricula in matriculas %}
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-6 py-4 font-bold text-slate-700">
-                        {{ aluno.user.get_full_name }}
+                        {# Acessamos o aluno através da matrícula #}
+                        {{ matricula.aluno.user.get_full_name }}
                     </td>
                     <td class="px-6 py-4 text-slate-500 text-sm">
-                        {{ aluno.user.email }}
+                        {{ matricula.aluno.user.email }}
                     </td>
                     <td class="px-6 py-4 text-center">
-                        {% if aluno.media_notas %}
-                            <span class="text-lg font-black text-blue-600">{{ aluno.media_notas|floatformat:1 }}</span>
-                        {% else %}
-                            <span class="text-slate-300 italic text-xs">Sem notas</span>
-                        {% endif %}
+                        {# Aqui depois você pode implementar a média por matéria se quiser #}
+                        <span class="text-slate-300 italic text-xs">Calculando...</span>
                     </td>
                     <td class="px-6 py-4 text-right">
                         <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-md uppercase">
-                            Ativo
+                            Ativo em {{ matricula.professor.disciplina_curso }}
                         </span>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="4" class="px-6 py-10 text-center text-slate-400 italic">
-                        Você ainda não tem alunos aprovados.
+                        Você ainda não tem alunos aprovados nesta disciplina.
                     </td>
                 </tr>
                 {% endfor %}
