@@ -3,66 +3,106 @@
 {% block title %}Cadastro de Aluno{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-    <div class="py-4 px-6 bg-blue-500 text-white text-center font-bold text-xl">
-        Cadastro de Aluno
+<style>
+    /* Estilização moderna para as checkboxes */
+    .custom-checkbox-list ul {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.75rem;
+        padding: 0;
+        margin: 0;
+    }
+    .custom-checkbox-list li {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 2px solid #f1f5f9;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .custom-checkbox-list li:hover {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+    .custom-checkbox-list input[type="checkbox"] {
+        width: 1.1rem;
+        height: 1.1rem;
+        margin-right: 0.75rem;
+        cursor: pointer;
+        accent-color: #2563eb;
+    }
+    .custom-checkbox-list label {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #1e293b;
+        cursor: pointer;
+        width: 100%;
+    }
+    /* Esconde as bolinhas da lista padrão do Django */
+    .custom-checkbox-list ul { list-style: none; }
+</style>
+
+<div class="max-w-2xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden mt-10 border-2 border-slate-100">
+    <div class="py-6 px-6 bg-blue-600 text-white text-center">
+        <h2 class="font-black text-2xl uppercase italic tracking-tighter">Cadastro de Aluno</h2>
     </div>
 
-    <form method="POST" class="p-6 space-y-4">
+    <form method="POST" class="p-8 space-y-6">
         {% csrf_token %}
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Nome Completo</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+                <label class="block text-xs font-black text-slate-500 uppercase ml-1">Nome Completo</label>
                 <input type="text" name="first_name" required
-                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
             </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">E-mail</label>
+            <div class="space-y-1">
+                <label class="block text-xs font-black text-slate-500 uppercase ml-1">E-mail</label>
                 <input type="email" name="email" required
-                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Contato (WhatsApp)</label>
-                <input type="text" name="contato" required
-                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Selecione seu Professor</label>
-                <select name="professor" required
-                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white transition">
-                    <option value="" disabled selected>Escolha um professor na lista</option>
-                    {% for choice in form.professor.field.queryset %}
-                        <option value="{{ choice.pk }}">{{ choice.user.get_full_name }} ({{ choice.disciplina_curso }})</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="space-y-1">
+            <label class="block text-xs font-black text-slate-500 uppercase ml-1">Contato (WhatsApp)</label>
+            <input type="text" name="contato" required
+                class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50"
+                placeholder="(00) 00000-0000">
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Senha</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div class="space-y-1">
+                <label class="block text-xs font-black text-slate-500 uppercase ml-1">Senha</label>
                 <input type="password" name="password" required
-                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
             </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Confirmar Senha</label>
+            <div class="space-y-1">
+                <label class="block text-xs font-black text-slate-500 uppercase ml-1">Confirmar Senha</label>
                 <input type="password" name="confirm_password" required
-                    class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
             </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100">
+            <label class="block text-xs font-black text-blue-600 uppercase mb-3 tracking-widest text-center">
+                Selecione seus Professores / Matérias
+            </label>
+            <div class="p-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 max-h-60 overflow-y-auto">
+                <div class="custom-checkbox-list">
+                    {{ form.professores }}
+                </div>
+            </div>
+            {% if form.professores.errors %}
+                <p class="text-red-500 text-[10px] font-bold mt-2 text-center">{{ form.professores.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <button type="submit"
-            class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
+            class="w-full bg-blue-600 hover:bg-black text-white font-black py-4 rounded-2xl transition duration-300 shadow-xl uppercase tracking-widest transform active:scale-95">
             Finalizar Cadastro de Aluno
         </button>
     </form>
-
-    <div class="bg-gray-50 py-3 text-center border-t">
-        <a href="{% url 'login' %}" class="text-sm text-blue-600 hover:underline">Já tem uma conta? Faça login</a>
-    </div>
 </div>
 {% endblock %}

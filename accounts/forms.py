@@ -32,15 +32,16 @@ class AlunoRegistrationForm(forms.ModelForm):
     confirm_password = forms.CharField(label="Confirmar Senha", widget=forms.PasswordInput)
 
     # Campo para selecionar o professor (vai vir do banco)
-    professor = forms.ModelChoiceField(
+    professores = forms.ModelMultipleChoiceField(
         queryset=Professor.objects.all(),
-        label="Selecione seu Professor",
-        empty_label="Selecione um professor na lista"
+        label="Selecione seus Professores / Matérias",
+        widget=forms.CheckboxSelectMultiple,
+        required=True
     )
 
     class Meta:
         model = Aluno
-        fields = ['contato', 'professor', 'foto']
+        fields = ['contato', 'professores', 'foto']
 
     def clean(self):
         cleaned_data = super().clean()
