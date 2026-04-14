@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import ProfessorRegistrationForm, AlunoRegistrationForm
+from .forms import ProfessorRegistrationForm, AlunoRegistrationForm, UserUpdateForm, ProfessorUpdateForm, AlunoUpdateForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -132,3 +132,35 @@ def lista_alunos_professor(request):
     ).order_by('user__first_name')
 
     return render(request, 'accounts/lista_alunos.html', {'alunos': alunos})
+
+
+@login_required
+def editar_perfil(request):
+    # Identifica qual é o perfil do usuário logado
+    if hasattr(request.user, 'professor_profile'):
+        perfil = request.user.professor_profile
+        perfil_form_class = ProfessorUpdateForm
+    else:
+        perfil = request.user.aluno_profile
+        perfil_form_class = AlunoUpdateForm
+
+    if request.method == 'POST':
+        # Instancia os dois formulários com os dados enviados
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        # O request.FILES é obrigatório para salvar a foto!
+        perfil_form = perfil_form_class(request.POST, request.FILES, instance=perfil)
+
+        if user_form.is_valid() and perfil_form.is_valid():
+            user_form.save()
+            perfil_form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('editar_perfil')
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        perfil_form = perfil_form_class(instance=perfil)
+
+    return render(request, 'accounts/editar_perfil.html', {
+        'user_form': user_form,
+        'perfil_form': perfil_form, # Passamos o form de perfil para o template
+        'perfil': perfil
+    })

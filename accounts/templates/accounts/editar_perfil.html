@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-2xl rounded-3xl border-2 border-slate-100">
+    <h2 class="text-3xl font-black text-slate-800 mb-8 uppercase italic tracking-tighter">⚙️ Configurações de Perfil</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {% csrf_token %}
+
+        <div class="flex flex-col items-center space-y-4">
+            <div class="w-40 h-40 rounded-full bg-slate-200 border-4 border-blue-600 overflow-hidden flex items-center justify-center shadow-inner">
+                {% if perfil.foto %}
+                    <img src="{{ perfil.foto.url }}" class="w-full h-full object-cover">
+                {% else %}
+                    <span class="text-5xl text-slate-400 font-black">{{ user.first_name|first }}</span>
+                {% endif %}
+            </div>
+            <label class="cursor-pointer bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-md">
+                Selecionar Foto
+                <div class="hidden">{{ perfil_form.foto }}</div>
+            </label>
+            <p class="text-[10px] text-slate-400 uppercase font-bold text-center">Clique no botão para escolher um arquivo</p>
+        </div>
+
+        <div class="md:col-span-2 space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-black text-slate-400 uppercase">Nome</label>
+                    {{ user_form.first_name }}
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-xs font-black text-slate-400 uppercase">Sobrenome</label>
+                    {{ user_form.last_name }}
+                </div>
+            </div>
+            <div class="space-y-1">
+                <label class="block text-xs font-black text-slate-400 uppercase">E-mail</label>
+                {{ user_form.email }}
+            </div>
+
+            {# CAMPOS EXTRAS (Formação, Contato, etc) #}
+            <div class="pt-4 border-t border-slate-100 grid grid-cols-1 gap-4">
+                {% for field in perfil_form %}
+                    {% if field.name != 'foto' %}
+                        <div class="space-y-1">
+                            <label class="block text-xs font-black text-slate-500 uppercase">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transition uppercase tracking-widest active:scale-95">
+                Salvar Alterações
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Estilização rápida para os inputs que o Django gera */
+    input[type="text"], input[type="email"], select {
+        width: 100%;
+        border: 2px solid #f1f5f9;
+        border-radius: 0.75rem;
+        padding: 0.75rem;
+        outline: none;
+        transition: all 0.2s;
+        background-color: #f8fafc;
+    }
+    input[type="text"]:focus, input[type="email"]:focus {
+        border-color: #2563eb;
+        background-color: white;
+    }
+</style>
+{% endblock %}
