@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Sum, Value, DecimalField
+from django.db.models.functions import Coalesce
 from .forms import LicaoForm
 from .models import Licao, Entrega
-from accounts.models import Aluno
+from accounts.models import Aluno, Professor
 
 
 @login_required
@@ -104,10 +105,45 @@ def dar_feedback(request, entrega_id):
 
 @login_required
 def ranking(request):
-    # Pegamos todos os alunos, somamos as notas das suas entregas
-    # e ordenamos do maior para o menor.
-    ranking_list = Aluno.objects.annotate(
-        pontos_totais=Sum('minhas_entregas__nota')
-    ).filter(pontos_totais__isnull=False).order_by('-pontos_totais')
+    # 1. Pegamos o valor bruto da URL
+    professor_id_raw = request.GET.get('professor_id')
 
-    return render(request, 'courses/ranking.html', {'ranking': ranking_list})
+    # 2. Lógica de Redirecionamento Inteligente
+    if professor_id_raw is None:
+        # Se for None, o cara clicou no link do menu agora (Primeiro acesso)
+        # Se ele for professor, mostramos a matéria dele por padrão
+        if hasattr(request.user, 'professor_profile'):
+            professor_id = str(request.user.professor_profile.id)
+        else:
+            professor_id = "" # Aluno vai direto para o Global
+    else:
+        # Se for "" (vazio), o cara escolheu "Global" no select
+        # Se for um número, o cara escolheu uma matéria específica
+        professor_id = professor_id_raw
+
+    ranking_query = Aluno.objects.all()
+
+    # 3. Filtragem e Soma
+    if professor_id and professor_id.isdigit():
+        ranking_list = ranking_query.filter(
+            minhas_entregas__licao__professor_id=professor_id
+        ).annotate(
+            pontos_totais=Coalesce(Sum('minhas_entregas__nota'), Value(0), output_field=DecimalField())
+        ).filter(pontos_totais__gt=0).order_by('-pontos_totais')
+
+        professor = Professor.objects.filter(id=professor_id).first()
+        filtro_nome = professor.disciplina_curso if professor else 'Global'
+    else:
+        # RANKING GLOBAL: Cai aqui se professor_id for ""
+        ranking_list = ranking_query.annotate(
+            pontos_totais=Coalesce(Sum('minhas_entregas__nota'), Value(0), output_field=DecimalField())
+        ).filter(pontos_totais__gt=0).order_by('-pontos_totais')
+        filtro_nome = 'Global'
+
+    context = {
+        'ranking': ranking_list,
+        'todos_professores': Professor.objects.all(),
+        'filtro_nome': filtro_nome,
+        'professor_selecionado': int(professor_id) if professor_id and professor_id.isdigit() else None
+    }
+    return render(request, 'courses/ranking.html', context)
