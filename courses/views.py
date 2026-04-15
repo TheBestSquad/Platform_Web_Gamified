@@ -105,43 +105,46 @@ def dar_feedback(request, entrega_id):
 
 @login_required
 def ranking(request):
-    # 1. Pegamos o valor bruto da URL
-    professor_id_raw = request.GET.get('professor_id')
+    professor_id = request.GET.get('professor_id')
 
-    # 2. Lógica de Redirecionamento Inteligente
-    if professor_id_raw is None:
-        # Se for None, o cara clicou no link do menu agora (Primeiro acesso)
-        # Se ele for professor, mostramos a matéria dele por padrão
-        if hasattr(request.user, 'professor_profile'):
-            professor_id = str(request.user.professor_profile.id)
-        else:
-            professor_id = "" # Aluno vai direto para o Global
-    else:
-        # Se for "" (vazio), o cara escolheu "Global" no select
-        # Se for um número, o cara escolheu uma matéria específica
-        professor_id = professor_id_raw
+    # Lógica de prioridade para Professor
+    if professor_id is None and hasattr(request.user, 'professor_profile'):
+        professor_id = str(request.user.professor_profile.id)
 
-    ranking_query = Aluno.objects.all()
+    # 1. Query Base: Todos os alunos com a soma de XP
+    ranking_geral = Aluno.objects.annotate(
+        pontos_totais=Coalesce(Sum('minhas_entregas__nota'), Value(0), output_field=DecimalField())
+    ).order_by('-pontos_totais')
 
-    # 3. Filtragem e Soma
+    # 2. Filtragem por Professor (se houver)
     if professor_id and professor_id.isdigit():
-        ranking_list = ranking_query.filter(
+        ranking_display = ranking_geral.filter(
             minhas_entregas__licao__professor_id=professor_id
-        ).annotate(
-            pontos_totais=Coalesce(Sum('minhas_entregas__nota'), Value(0), output_field=DecimalField())
-        ).filter(pontos_totais__gt=0).order_by('-pontos_totais')
-
+        ).filter(pontos_totais__gt=0)
         professor = Professor.objects.filter(id=professor_id).first()
         filtro_nome = professor.disciplina_curso if professor else 'Global'
     else:
-        # RANKING GLOBAL: Cai aqui se professor_id for ""
-        ranking_list = ranking_query.annotate(
-            pontos_totais=Coalesce(Sum('minhas_entregas__nota'), Value(0), output_field=DecimalField())
-        ).filter(pontos_totais__gt=0).order_by('-pontos_totais')
+        ranking_display = ranking_geral.filter(pontos_totais__gt=0)
         filtro_nome = 'Global'
 
+    # 3. HALL DA FAMA: Apenas o Top 5
+    top_5 = ranking_display[:5]
+
+    # 4. POSIÇÃO DO ALUNO LOGADO:
+    # Procuramos o aluno na lista completa do ranking atual
+    minha_posicao = None
+    if hasattr(request.user, 'aluno_profile'):
+        meu_aluno_id = request.user.aluno_profile.id
+        # Convertemos para lista para achar o índice
+        lista_ranking = list(ranking_display)
+        for i, aluno in enumerate(lista_ranking):
+            if aluno.id == meu_aluno_id:
+                minha_posicao = i + 1
+                break
+
     context = {
-        'ranking': ranking_list,
+        'top_5': top_5,
+        'minha_posicao': minha_posicao,
         'todos_professores': Professor.objects.all(),
         'filtro_nome': filtro_nome,
         'professor_selecionado': int(professor_id) if professor_id and professor_id.isdigit() else None

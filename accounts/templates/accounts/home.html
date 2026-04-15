@@ -32,7 +32,6 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    {# AJUSTADO: Agora percorremos as matriculas para acessar o aluno #}
                     {% for matricula in matriculas_pendentes %}
                     <tr>
                         <td class="px-6 py-4">{{ matricula.aluno.user.get_full_name }}</td>
@@ -51,6 +50,54 @@
         </div>
 
     {% elif perfil == 'aluno' %}
+
+        <div class="bg-white rounded-3xl p-8 shadow-xl border-2 border-slate-100 mb-10 transform hover:scale-[1.01] transition-all">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+                <div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Seu Progresso Atual</span>
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-3xl font-black {{ aluno.nivel_info.cor }} uppercase italic tracking-tighter">
+                            {{ aluno.nivel_info.nome }}
+                        </h3>
+                    </div>
+                </div>
+                <div class="text-left md:text-right">
+                    <span class="text-2xl font-black text-slate-800">{{ aluno.xp_total|floatformat:0 }} <span class="text-blue-600 text-sm">XP</span></span>
+                    <p class="text-[10px] text-slate-400 font-bold italic uppercase tracking-widest">Próximo nível: {{ aluno.nivel_info.proximo }} XP</p>
+                </div>
+            </div>
+
+            <div class="relative w-full bg-slate-100 h-6 rounded-2xl overflow-hidden border-2 border-slate-50 shadow-inner">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-700 h-full rounded-2xl transition-all duration-1000 shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center"
+                     style="width: {{ aluno.progresso_nivel }}%">
+                    {% if aluno.progresso_nivel > 10 %}
+                        <span class="text-[9px] font-black text-white uppercase tracking-tighter opacity-80">{{ aluno.progresso_nivel|floatformat:0 }}%</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-8 border-t border-slate-100 pt-6">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-center italic">🏆 Galeria de Conquistas</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    {% for medalha in aluno.minhas_medalhas.all %}
+                        <div class="flex items-center bg-white border-2 border-slate-50 rounded-2xl px-4 py-3 shadow-sm hover:scale-110 transition-transform cursor-help group hover:border-blue-300" title="Conquistado em {{ medalha.data_conquista|date:'d/m/Y' }}">
+                            <span class="text-3xl mr-3">
+                                {% if medalha.tipo == 'DOMINIO' %}🥇{% elif medalha.tipo == 'PRATICA' %}🛠️{% else %}📈{% endif %}
+                            </span>
+                            <div>
+                                <p class="text-[10px] font-black text-slate-800 uppercase leading-tight">{{ medalha.titulo }}</p>
+                                <p class="text-[8px] font-bold text-blue-600 uppercase tracking-tighter">{{ medalha.get_tipo_display }}</p>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-2">
+                            <p class="text-[11px] font-bold text-slate-300 uppercase italic tracking-widest">Complete lições para desbloquear medalhas! 🚀</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
         <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-10">
             <h2 class="text-xl font-black text-blue-800 mb-4 uppercase tracking-tighter">Status das Matérias</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -71,7 +118,8 @@
         </div>
     {% endif %}
 
-    {# MURAL DE LIÇÕES ORGANIZADO #}
+    <hr class="border-slate-100 mb-10">
+
     {% if perfil == 'professor' %}
         <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
             <span class="w-2 h-8 bg-blue-600 rounded mr-3"></span>
@@ -86,7 +134,6 @@
         </div>
 
     {% elif perfil == 'aluno' %}
-        {# Lógica de exibição por matéria para o aluno #}
         {% for professor, licoes in licoes_por_professor.items %}
             <div class="mb-12">
                 <h3 class="text-2xl font-black text-slate-800 mb-6 flex items-center italic uppercase tracking-tighter">
@@ -99,7 +146,6 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for licao in licoes %}
-                        {# Card de Lição (o código que você já tinha) #}
                         <div class="bg-white border-2 border-slate-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                             <div>
                                 <div class="flex justify-between items-start mb-4">
