@@ -32,30 +32,35 @@ def criar_licao(request):
 @login_required
 def detalhe_licao(request, licao_id):
     licao = get_object_or_404(Licao, id=licao_id)
-    entrega = None
     perfil = 'aluno' if hasattr(request.user, 'aluno_profile') else 'professor'
+    entregas = []
+    entrega_recente = None
 
     # 1. Se for Aluno, busca (ou salva) a entrega
     if hasattr(request.user, 'aluno_profile'):
         aluno = request.user.aluno_profile
-        entrega = Entrega.objects.filter(licao=licao, aluno=aluno).first()
+        entregas = Entrega.objects.filter(licao=licao, aluno=aluno).order_by('-data_entrega')
+        tentativas_atuais = entregas.count()
+        entrega_recente = entregas.first()
 
         if request.method == 'POST':
-            if entrega:
+            if tentativas_atuais >= 3:
+                messages.error(request, 'Você já atingiu o limite de 3 tentativas para esta lição')
                 return redirect('detalhe_licao', licao_id=licao.id)
 
             resposta = request.POST.get('resposta')
             codigo = request.POST.get('codigo')
 
             # Salva ou atualiza a resposta
-            Entrega.objects.update_or_create(
+            Entrega.objects.create(
                 licao=licao,
                 aluno=aluno,
                 resposta_texto=resposta,
                 codigo_enviado=codigo,
+                tentativa_numero=tentativas_atuais + 1,
             )
             # Redireciona para a PRÓPRIA página para evitar reenvio de formulário no F5
-            messages.success(request, 'Sua resposta foi enviada com sucesso! Agora é só aguardar a correção. 😉')
+            messages.success(request, f'Tentativa {tentativas_atuais + 1} enviada com sucesso!')
             return redirect('home')
 
     # 2. Se for Professor, ele apenas visualiza (não entra no POST de aluno)
@@ -71,8 +76,9 @@ def detalhe_licao(request, licao_id):
 
     return render(request, 'courses/detalhe_licao.html', {
         'licao': licao,
-        'entrega': entrega,
+        'entrega': entrega_recente,
         'perfil': perfil,
+        'tentativas': entregas,
     })
 
 
