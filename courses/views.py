@@ -84,13 +84,18 @@ def detalhe_licao(request, licao_id):
 
 @login_required
 def lista_entregas(request):
-    if not hasattr(request.user, 'professor_profile'):
-        return redirect('home')
+    # Verifica se o utilizador logado é um professor
+    if hasattr(request.user, 'professor_profile'):
+        # Procura todas as entregas das lições que pertencem a este professor
+        # Ordenamos por '-data_entrega' para que as mais recentes (Tentativa #3, por exemplo) apareçam primeiro
+        entregas = Entrega.objects.filter(
+            licao__professor=request.user.professor_profile
+        ).order_by('-data_entrega')
 
-    # Busca todas as entregas feitas para as lições deste professor
-    entregas = Entrega.objects.filter(licao__professor=request.user.professor_profile).order_by('-data_entrega')
+        return render(request, 'courses/lista_entregas.html', {'entregas': entregas})
 
-    return render(request, 'courses/lista_entregas.html', {'entregas': entregas})
+    # Se não for professor, redireciona para a home ou outra página
+    return redirect('home')
 
 
 @login_required
@@ -98,12 +103,13 @@ def dar_feedback(request, entrega_id):
     if not hasattr(request.user, 'professor_profile'):
         return redirect('home')
 
-    entrega = get_object_or_404(Entrega, id=entrega_id, licao__professor=request.user.professor_profile)
+    entrega = get_object_or_404(Entrega, id=entrega_id)
 
     if request.method == 'POST':
-        entrega.feedback = request.POST.get('feedback')
-        entrega.nota = request.POST.get('nota')
+        feedback = request.POST.get('feedback')
+        entrega.feedback = feedback
         entrega.save()
+        messages.success(request, f'Feedback enviado para {entrega.aluno}!')
         return redirect('lista_entregas')
 
     return render(request, 'courses/dar_feedback.html', {'entrega': entrega})
