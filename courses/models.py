@@ -37,6 +37,8 @@ class Entrega(models.Model):
     class Meta:
         # Garante que o aluno só entregue uma vez por lição (opcional)
         unique_together = ['licao', 'aluno']
+        verbose_name = 'Entrega'
+        verbose_name_plural = 'Entregas'
 
 
 @receiver(post_save, sender=Entrega)

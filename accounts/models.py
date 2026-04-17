@@ -15,6 +15,10 @@ class Professor(models.Model):
     def __str__(self):
         return f'Professor {self.user.first_name} {self.user.last_name} - {self.disciplina_curso}'
 
+    class Meta:
+        verbose_name = 'Professor'
+        verbose_name_plural = 'Professores'
+
 
 class Aluno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='aluno_profile')
@@ -60,6 +64,10 @@ class Aluno(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
+    class Meta:
+        verbose_name = 'Aluno'
+        verbose_name_plural = 'Alunos'
+
 
 class Matricula(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
@@ -69,6 +77,8 @@ class Matricula(models.Model):
 
     class Meta:
         unique_together = ('aluno', 'professor')
+        verbose_name = 'Matrícula'
+        verbose_name_plural = 'Matrículas'
 
 
 class Medalha(models.Model):
@@ -85,3 +95,8 @@ class Medalha(models.Model):
 
     def __str__(self):
         return f"{self.titulo} - {self.aluno.user.first_name}"
+
+    class Meta:
+        verbose_name = 'Medalha'
+        verbose_name_plural = 'Medalhas'
+
