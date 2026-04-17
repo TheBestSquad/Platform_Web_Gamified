@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Professor, Aluno
+from .models import Professor, Aluno, Medalha, Matricula
 
 
 @admin.register(Professor)
@@ -26,4 +26,18 @@ class AlunoAdmin(admin.ModelAdmin):
     def get_professores(self, obj):
         return ", ".join([p.user.first_name for p in obj.professores.all()])
     get_professores.short_description = 'Professores/Matérias'
+
+
+@admin.register(Matricula)
+class MatriculaAdmin(admin.ModelAdmin):
+    list_display = ('aluno', 'professor', 'is_approved', 'data_vinculo')
+    list_filter = ('is_approved', 'professor')
+    list_editable = ('is_approved',)
+
+
+@admin.register(Medalha)
+class MedalhaAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'aluno', 'tipo', 'data_conquista')
+    list_filter = ('tipo', 'data_conquista')
+    search_fields = ('aluno__user__first_name', 'titulo')
 
