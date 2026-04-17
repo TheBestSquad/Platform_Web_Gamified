@@ -25,6 +25,7 @@ class Licao(models.Model):
 class Entrega(models.Model):
     licao = models.ForeignKey(Licao, on_delete=models.CASCADE, related_name='entregas')
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='minhas_entregas')
+    tentativa_numero = models.PositiveIntegerField(default=1, verbose_name="Tentativa Nº")
     resposta_texto = models.TextField(verbose_name="Resposta do Aluno", blank=True)
     codigo_enviado = models.TextField(verbose_name="Código/Script", blank=True)
 
@@ -35,10 +36,9 @@ class Entrega(models.Model):
     data_entrega = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # Garante que o aluno só entregue uma vez por lição (opcional)
-        unique_together = ['licao', 'aluno']
         verbose_name = 'Entrega'
         verbose_name_plural = 'Entregas'
+        ordering = ['-data_entrega']
 
 
 @receiver(post_save, sender=Entrega)

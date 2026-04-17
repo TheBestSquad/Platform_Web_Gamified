@@ -30,11 +30,14 @@ class Aluno(models.Model):
 
     @property
     def xp_total(self):
-        # Soma todas as notas das entregas (que agora chamamos de XP)
-        # O related_name 'minhas_entregas' vem do model Entrega
-        return self.minhas_entregas.aggregate(
-            total=Coalesce(Sum('nota'), models.Value(0, output_field=models.DecimalField()))
-        )['total']
+        entregas = self.minhas_entregas.all()
+        total_xp = 0
+        for entrega in entregas:
+            if entrega.tentativa_numero == 1:
+                total_xp += 10
+            elif entrega.tentativa_numero in [2, 3]:
+                total_xp += 15
+        return total_xp
 
     @property
     def nivel_info(self):
