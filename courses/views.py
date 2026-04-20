@@ -119,37 +119,39 @@ def dar_feedback(request, entrega_id):
 def ranking(request):
     professor_id = request.GET.get('professor_id')
 
-    # Lógica de prioridade para Professor
     if professor_id is None and hasattr(request.user, 'professor_profile'):
         professor_id = str(request.user.professor_profile.id)
 
-    # 1. Query Base: Todos os alunos com a soma de XP
-    ranking_geral = Aluno.objects.annotate(
-        pontos_totais=Coalesce(Sum('minhas_entregas__nota'), Value(0), output_field=DecimalField())
-    ).order_by('-pontos_totais')
+    # 1. Query Base
+    ranking_base = Aluno.objects.all()
 
-    # 2. Filtragem por Professor (se houver)
     if professor_id and professor_id.isdigit():
-        ranking_display = ranking_geral.filter(
+        # Ranking por Matéria
+        ranking_display = ranking_base.filter(
             minhas_entregas__licao__professor_id=professor_id
-        ).filter(pontos_totais__gt=0)
+        ).annotate(
+            # SOMAMOS O CAMPO 'XP' DA ENTREGA
+            pontos_totais=Coalesce(Sum('minhas_entregas__xp'), Value(0))
+        ).filter(pontos_totais__gt=0).order_by('-pontos_totais').distinct()
+
         professor = Professor.objects.filter(id=professor_id).first()
         filtro_nome = professor.disciplina_curso if professor else 'Global'
     else:
-        ranking_display = ranking_geral.filter(pontos_totais__gt=0)
+        # Ranking Global
+        ranking_display = ranking_base.annotate(
+            pontos_totais=Coalesce(Sum('minhas_entregas__xp'), Value(0))
+        ).filter(pontos_totais__gt=0).order_by('-pontos_totais').distinct()
         filtro_nome = 'Global'
 
-    # 3. HALL DA FAMA: Apenas o Top 5
+    # Hall da Fama e Posição (O restante do seu código continua igual...)
     top_5 = ranking_display[:5]
 
-    # 4. POSIÇÃO DO ALUNO LOGADO:
-    # Procuramos o aluno na lista completa do ranking atual
+    # 4. POSIÇÃO DO ALUNO LOGADO
     minha_posicao = None
     if hasattr(request.user, 'aluno_profile'):
         meu_aluno_id = request.user.aluno_profile.id
-        # Convertemos para lista para achar o índice
-        lista_ranking = list(ranking_display)
-        for i, aluno in enumerate(lista_ranking):
+        # Transformamos em lista apenas o necessário para performance
+        for i, aluno in enumerate(ranking_display):
             if aluno.id == meu_aluno_id:
                 minha_posicao = i + 1
                 break

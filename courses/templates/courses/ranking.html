@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto mt-10">
+    {# CABEÇALHO COM SELETOR #}
     <div class="bg-slate-800 rounded-t-3xl p-8 text-center shadow-xl border-b-4 border-blue-600">
         <h2 class="text-4xl font-black text-white uppercase italic tracking-tighter">🏆 Hall da Fama</h2>
         <p class="text-blue-300 font-bold text-sm mt-2 uppercase tracking-widest">{{ filtro_nome }}</p>
@@ -19,6 +20,7 @@
         </form>
     </div>
 
+    {# LISTA DE ALUNOS #}
     <div class="bg-white p-6 border-x-2 border-slate-100">
         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 text-center italic">Apenas os 5 melhores desenvolvedores</p>
 
@@ -29,7 +31,14 @@
                         {% if forloop.first %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}#{{ forloop.counter }}{% endif %}
                     </span>
                     <div>
-                        <p class="font-black text-slate-800 uppercase text-lg">{{ aluno.user.get_full_name }}</p>
+                        {# AJUSTE NO NOME PARA EVITAR VAZIOS #}
+                        <p class="font-black text-slate-800 uppercase text-lg leading-tight">
+                            {% if aluno.user.get_full_name %}
+                                {{ aluno.user.get_full_name }}
+                            {% else %}
+                                {{ aluno.user.username }}
+                            {% endif %}
+                        </p>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             {% if professor_selecionado %}
                                 Disciplina: {{ filtro_nome }}
@@ -40,6 +49,7 @@
                     </div>
                 </div>
                 <div class="text-right">
+                    {# EXIBINDO O XP CALCULADO NA VIEW #}
                     <p class="text-3xl font-black text-blue-600">{{ aluno.pontos_totais|floatformat:0 }}</p>
                     <p class="text-[10px] font-black text-slate-400 uppercase">XP Acumulado</p>
                 </div>
@@ -51,6 +61,7 @@
         {% endfor %}
     </div>
 
+    {# RODAPÉ COM POSIÇÃO DO ALUNO LOGADO #}
     {% if minha_posicao %}
     <div class="bg-blue-600 rounded-b-3xl p-6 shadow-2xl border-x-2 border-b-2 border-blue-500 transform -mt-1">
         <div class="flex justify-between items-center text-white">
@@ -69,7 +80,9 @@
         </div>
     </div>
     {% else %}
-    <div class="bg-slate-100 rounded-b-3xl p-6 border-x-2 border-b-2 border-slate-200"></div>
+    <div class="bg-slate-100 rounded-b-3xl p-6 border-x-2 border-b-2 border-slate-200">
+        <p class="text-center text-slate-400 text-[10px] font-black uppercase">Complete lições para aparecer aqui</p>
+    </div>
     {% endif %}
 
     <div class="mt-8 text-center pb-10">
