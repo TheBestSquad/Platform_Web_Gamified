@@ -4,7 +4,7 @@
 {# Pegamos a última entrega para verificar se o aluno já acertou #}
 {% with ultima_entrega=tentativas.first %}
 
-{# GRID SUPERIOR: CONTEÚDO E ENVIO #}
+{# GRID SUPERIOR: CONTEÚDO E ENVIO (DUAS COLUNAS) #}
 <div class="flex flex-col lg:flex-row gap-6 mb-8">
 
     {# COLUNA ESQUERDA: CONTEÚDO DA LIÇÃO #}
@@ -54,21 +54,19 @@
 
                 {# LÓGICA DE EXIBIÇÃO DO FORMULÁRIO #}
                 {% if ultima_entrega.acertou %}
-                    {# ALUNO ACERTOU: MOSTRA SUCESSO #}
                     <div class="flex-grow flex flex-col items-center justify-center p-8 bg-green-50 border-2 border-green-200 rounded-2xl text-center">
                         <span class="text-5xl block mb-4">🎯</span>
                         <p class="text-green-800 font-black text-lg uppercase italic">Lição Concluída!</p>
                         <p class="text-green-600 text-[11px] mt-2 font-bold uppercase">O professor validou sua resposta. Excelente trabalho!</p>
                     </div>
                 {% elif tentativas.count < 3 %}
-                    {# AINDA TEM TENTATIVAS: MOSTRA FORMULÁRIO (SEM CÓDIGO) #}
                     <form method="POST" class="space-y-4 flex-grow">
                         {% csrf_token %}
                         <div>
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Sua Resposta/Explicação:</label>
                             <textarea name="resposta" required
                                       placeholder="Escreva sua resposta detalhadamente aqui..."
-                                      class="w-full border-4 border-slate-100 rounded-2xl p-4 outline-none focus:border-blue-500 transition text-slate-700"
+                                      class="w-full border-4 border-slate-100 rounded-2xl p-4 outline-none focus:border-blue-500 transition text-slate-700 font-medium"
                                       rows="10"></textarea>
                         </div>
 
@@ -77,11 +75,10 @@
                         </button>
                     </form>
                 {% else %}
-                    {# TENTATIVAS ESGOTADAS E NÃO ACERTOU #}
                     <div class="flex-grow flex flex-col items-center justify-center p-8 bg-red-50 border-2 border-red-200 rounded-2xl text-center">
                         <span class="text-3xl block mb-2">🚫</span>
                         <p class="text-red-800 font-black text-sm uppercase">Tentativas Esgotadas</p>
-                        <p class="text-red-600 text-[10px] mt-2 italic">O professor enviou o feedback final para suas 3 tentativas.</p>
+                        <p class="text-red-600 text-[10px] mt-2 italic font-bold">O professor enviou o feedback final para suas 3 tentativas.</p>
                     </div>
                 {% endif %}
             </div>
@@ -89,7 +86,7 @@
     </div>
 </div>
 
-{# SEÇÃO INFERIOR: PERCURSO #}
+{# SEÇÃO INFERIOR: PERCURSO EM LARGURA TOTAL #}
 {% if perfil == 'aluno' %}
 <div class="mt-12 space-y-8 pb-12">
     <div class="flex items-center gap-4">
@@ -101,7 +98,7 @@
     <div class="space-y-8">
         {% for e in tentativas %}
             <div class="bg-white rounded-2xl border-4 {% if e.acertou %}border-green-200{% else %}border-slate-100{% endif %} shadow-sm overflow-hidden">
-                {# CABEÇALHO #}
+                {# CABEÇALHO DA TENTATIVA #}
                 <div class="{% if e.acertou %}bg-green-600{% else %}bg-slate-800{% endif %} px-6 py-3 flex justify-between items-center">
                     <span class="font-black text-xs uppercase text-white tracking-widest">
                         TENTATIVA #{{ e.tentativa_numero }} {% if e.acertou %}(CORRETA ✅){% endif %}
@@ -109,8 +106,8 @@
                     <span class="text-[10px] text-white/60 font-bold">{{ e.data_entrega|date:"d/m/Y - H:i" }}</span>
                 </div>
 
-                <div class="p-8 space-y-6">
-                    {# RESPOSTA #}
+                <div class="p-8 space-y-8">
+                    {# 1. RESPOSTA #}
                     <div>
                         <h4 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-wider">● Sua Resposta:</h4>
                         <div class="text-slate-700 text-base leading-relaxed pl-4 border-l-2 border-slate-100">
@@ -118,14 +115,39 @@
                         </div>
                     </div>
 
-                    {# FEEDBACK #}
-                    <div class="{% if e.acertou %}bg-green-50 border-green-100{% else %}bg-blue-50 border-blue-100{% endif %} rounded-2xl p-6 border-2">
-                        <h4 class="text-[11px] font-black {% if e.acertou %}text-green-700{% else %}text-blue-700{% endif %} uppercase mb-3 tracking-wider">
-                            ● Feedback do Professor:
+                    {# 2. FEEDBACK DO PROFESSOR (COM LÓGICA DE ENCERRAMENTO) #}
+                    <div class="rounded-2xl p-6 border-2 transition-all
+                        {% if e.acertou %}
+                            bg-green-50 border-green-100
+                        {% elif e.tentativa_numero == 3 %}
+                            bg-amber-50 border-amber-200 shadow-inner
+                        {% else %}
+                            bg-blue-50 border-blue-100
+                        {% endif %}">
+
+                        <h4 class="text-[11px] font-black uppercase mb-3 tracking-wider
+                            {% if e.acertou %}
+                                text-green-700
+                            {% elif e.tentativa_numero == 3 %}
+                                text-amber-700
+                            {% else %}
+                                text-blue-700
+                            {% endif %}">
+                            ● {% if e.tentativa_numero == 3 and not e.acertou %}FEEDBACK DE ENCERRAMENTO:{% else %}Feedback do Professor:{% endif %}
                         </h4>
+
                         <div class="pl-4">
                             {% if e.feedback %}
                                 <p class="text-slate-800 text-sm italic leading-relaxed">"{{ e.feedback }}"</p>
+
+                                {# Nota de rodapé apenas se for o encerramento sem acerto #}
+                                {% if e.tentativa_numero == 3 and not e.acertou %}
+                                    <div class="mt-4 pt-4 border-t border-amber-200">
+                                        <span class="text-[9px] font-black text-amber-600 uppercase tracking-widest">
+                                            ⚠️ Ciclo de tentativas finalizado para esta lição. Verifique a correção acima.
+                                        </span>
+                                    </div>
+                                {% endif %}
                             {% else %}
                                 <div class="flex items-center text-slate-400 text-xs italic">
                                     <svg class="w-4 h-4 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
