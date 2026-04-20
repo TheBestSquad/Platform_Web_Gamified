@@ -62,26 +62,27 @@
                 <div>
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Seu Progresso Atual</span>
                     <div class="flex items-center gap-3">
-                        <h3 class="text-3xl font-black {{ aluno.nivel_info.cor }} uppercase italic tracking-tighter">
-                            {{ aluno.nivel_info.nome }}
+                        {# ATUALIZADO: Usando nome_nivel e cor_nivel da view #}
+                        <h3 class="text-3xl font-black {{ cor_nivel }} uppercase italic tracking-tighter">
+                            {{ nome_nivel }}
                         </h3>
                     </div>
                 </div>
                 <div class="text-left md:text-right">
-                    {# XP TOTAL CALCULADO PELA VIEW #}
                     <span class="text-2xl font-black text-slate-800">{{ xp_total|floatformat:0 }} <span class="text-blue-600 text-sm">XP</span></span>
-                    <p class="text-[10px] text-slate-400 font-bold italic uppercase tracking-widest">Próximo nível: {{ aluno.nivel_info.proximo }} XP</p>
+                    {# ATUALIZADO: Usando proximo_xp da view #}
+                    <p class="text-[10px] text-slate-400 font-bold italic uppercase tracking-widest">Próximo nível: {{ proximo_xp }} XP</p>
                 </div>
             </div>
 
             {# BARRA DE NÍVEL #}
             <div class="relative w-full bg-slate-100 h-6 rounded-2xl overflow-hidden border-2 border-slate-50 shadow-inner">
-                {# Assumindo que o primeiro nível vai até 100 XP para a barra preencher proporcionalmente #}
+                {# ATUALIZADO: Usando progresso_barra calculado na view #}
                 <div class="bg-gradient-to-r from-blue-500 to-blue-700 h-full rounded-2xl transition-all duration-1000 shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center"
-                     style="width: {% if xp_total > 100 %}100{% else %}{{ xp_total }}{% endif %}%">
-                    {% if xp_total > 10 %}
+                     style="width: {{ progresso_barra|floatformat:0 }}%">
+                    {% if progresso_barra > 5 %}
                         <span class="text-[9px] font-black text-white uppercase tracking-tighter opacity-80">
-                            {{ xp_total|floatformat:0 }}% do Iniciante
+                            {{ progresso_barra|floatformat:0 }}% do {{ nome_nivel }}
                         </span>
                     {% endif %}
                 </div>
@@ -175,9 +176,13 @@
                             </div>
 
                             <div class="space-y-2 mt-4">
-                                {% if licao.id in entregas_feitas %}
+                                {% if licao.id in licoes_finalizadas %}
                                     <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-black py-3 px-4 rounded-xl text-xs transition shadow-sm uppercase tracking-widest">
                                         ✅ Ver Nota e Feedback
+                                    </a>
+                                {% elif licao.id in entregas_feitas %}
+                                    <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black py-3 px-4 rounded-xl text-xs transition shadow-sm uppercase tracking-widest">
+                                        🔄 Aguardando / Tentar Novamente
                                     </a>
                                 {% else %}
                                     <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 px-4 rounded-xl text-xs transition shadow-sm uppercase tracking-widest">

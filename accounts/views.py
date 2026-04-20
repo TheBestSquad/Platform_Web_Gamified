@@ -57,7 +57,7 @@ def register_aluno(request):
 
 @login_required
 def home(request):
-    context = {}  # Criamos um contexto vazio para garantir que algo sempre seja enviado
+    context = {}
 
     # 1. Lógica para Professor
     if hasattr(request.user, 'professor_profile'):
@@ -78,13 +78,45 @@ def home(request):
         aluno = request.user.aluno_profile
         from .models import Matricula
         from courses.models import Licao, Entrega
-        from django.db.models import Sum
+        from django.db.models import Sum, Count
 
+        # 1. XP Total Real
         xp_total = Entrega.objects.filter(aluno=aluno).aggregate(total=Sum('xp'))['total'] or 0
 
-        licoes_por_professor = {}
+        # --- LÓGICA DA BARRA DE PROGRESSO POR NÍVEL ---
+        if xp_total < 100:
+            nome_nivel = "Iniciante"
+            cor_nivel = "text-slate-400"
+            proximo_xp = 100
+            # No primeiro nível, a barra é direta (0 a 100)
+            progresso_barra = xp_total
+        elif xp_total < 500:
+            nome_nivel = "Intermediário"
+            cor_nivel = "text-blue-500"
+            proximo_xp = 500
+            # Cálculo: (XP atual - XP que já passou) / (XP do nível atual)
+            progresso_barra = ((xp_total - 100) / (500 - 100)) * 100
+        else:
+            nome_nivel = "Avançado"
+            cor_nivel = "text-yellow-500"
+            proximo_xp = 1000
+            progresso_barra = ((xp_total - 500) / (1000 - 500)) * 100
+
+        # 2. Lições que o aluno já tocou (qualquer tentativa)
         entregas_feitas = Entrega.objects.filter(aluno=aluno).values_list('licao_id', flat=True)
 
+        # 3. Lições que ele ACERTOU
+        licoes_acertadas = Entrega.objects.filter(aluno=aluno, acertou=True).values_list('licao_id', flat=True)
+
+        # 4. Lições onde ele ESGOTOU as 3 tentativas
+        licoes_esgotadas = Entrega.objects.filter(aluno=aluno).values('licao_id').annotate(
+            total_tentativas=Count('id')
+        ).filter(total_tentativas__gte=3).values_list('licao_id', flat=True)
+
+        # Unir os IDs de lições finalizadas para o botão ficar verde
+        licoes_finalizadas = set(list(licoes_acertadas) + list(licoes_esgotadas))
+
+        licoes_por_professor = {}
         # Buscamos apenas as lições dos professores que já APROVARAM esse aluno
         matriculas_ativas = Matricula.objects.filter(aluno=aluno, is_approved=True)
 
@@ -98,14 +130,18 @@ def home(request):
             'aluno': aluno,
             'licoes_por_professor': licoes_por_professor,
             'entregas_feitas': entregas_feitas,
+            'licoes_finalizadas': licoes_finalizadas,
             'xp_total': xp_total,
+            'progresso_barra': progresso_barra,
+            'proximo_xp': proximo_xp,
+            'nome_nivel': nome_nivel,
+            'cor_nivel': cor_nivel,
         }
 
     # 3. Lógica para Admin/Outros
     else:
         context = {'perfil': 'admin'}
 
-    # O RETURN DEVE FICAR AQUI, FORA DE TODOS OS IFs
     return render(request, 'accounts/home.html', context)
 
 
