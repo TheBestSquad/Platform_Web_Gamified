@@ -78,6 +78,9 @@ def home(request):
         aluno = request.user.aluno_profile
         from .models import Matricula
         from courses.models import Licao, Entrega
+        from django.db.models import Sum
+
+        xp_total = Entrega.objects.filter(aluno=aluno).aggregate(total=Sum('xp'))['total'] or 0
 
         licoes_por_professor = {}
         entregas_feitas = Entrega.objects.filter(aluno=aluno).values_list('licao_id', flat=True)
@@ -95,6 +98,7 @@ def home(request):
             'aluno': aluno,
             'licoes_por_professor': licoes_por_professor,
             'entregas_feitas': entregas_feitas,
+            'xp_total': xp_total,
         }
 
     # 3. Lógica para Admin/Outros

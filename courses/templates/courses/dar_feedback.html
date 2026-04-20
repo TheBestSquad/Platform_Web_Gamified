@@ -24,38 +24,38 @@
             {# 1. RESPOSTA EM TEXTO DO ALUNO #}
             <section>
                 <h3 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-widest flex items-center">
-                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span> Resposta em Texto:
+                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span> Resposta do Aluno:
                 </h3>
-                <div class="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100 text-slate-700 leading-relaxed">
+                <div class="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100 text-slate-700 leading-relaxed text-lg">
                     {{ entrega.resposta_texto|linebreaks }}
                 </div>
             </section>
 
-            {# 2. SCRIPT / CÓDIGO ENVIADO #}
-            {% if entrega.codigo_enviado %}
-            <section>
-                <h3 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-widest flex items-center">
-                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span> Script Enviado (Python):
-                </h3>
-                <div class="bg-slate-900 rounded-2xl p-6 shadow-inner relative">
-                    <span class="absolute top-3 right-5 text-[9px] text-slate-500 font-mono uppercase">source_code</span>
-                    <pre class="text-green-400 font-mono text-sm overflow-x-auto leading-relaxed"><code>{{ entrega.codigo_enviado }}</code></pre>
-                </div>
-            </section>
-            {% endif %}
+            {# O CAMPO DE CÓDIGO FOI REMOVIDO CONFORME SOLICITADO NA REUNIÃO #}
 
             <hr class="border-t-2 border-slate-100">
 
-            {# 3. FORMULÁRIO DE FEEDBACK (O QUE O PROFESSOR PREENCHE) #}
+            {# 3. FORMULÁRIO DE FEEDBACK #}
             <section>
                 <form method="POST" class="space-y-4">
                     {% csrf_token %}
 
+                    {# CARD DE DECISÃO: ACERTOU OU NÃO? #}
+                    <div class="bg-blue-50 p-6 rounded-2xl border-4 border-blue-100 mb-6">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" name="acertou" class="w-8 h-8 rounded-lg text-blue-600 border-slate-300 focus:ring-blue-500 transition-all cursor-pointer">
+                            <div class="ml-4">
+                                <span class="block text-lg font-black text-blue-800 uppercase italic leading-none">O Aluno acertou a lição?</span>
+                                <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Marque para encerrar o ciclo de tentativas e dar nota 10</span>
+                            </div>
+                        </label>
+                    </div>
+
                     <div class="flex items-center justify-between mb-2">
-                        <label class="text-[11px] font-black text-slate-800 uppercase tracking-widest">
+                        <label class="text-[11px] font-black text-slate-800 uppercase tracking-widest ml-2">
                             Seu Feedback de Mentoria:
                         </label>
-                        <span class="text-[10px] text-slate-400 font-bold italic">* O aluno receberá uma notificação ao salvar</span>
+                        <span class="text-[10px] text-slate-400 font-bold italic">* Feedback final da tentativa #{{ entrega.tentativa_numero }}</span>
                     </div>
 
                     <textarea
@@ -63,13 +63,13 @@
                         required
                         class="w-full border-4 border-slate-100 rounded-2xl p-6 outline-none focus:border-blue-500 transition-all text-slate-700 font-medium"
                         rows="6"
-                        placeholder="Analise o código acima e dê sugestões de melhoria para o aluno..."></textarea>
+                        placeholder="Escreva as considerações sobre a resposta do aluno..."></textarea>
 
                     <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                        <button type="submit" class="flex-grow bg-green-500 hover:bg-green-600 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest">
-                            ✓ Salvar Feedback e Concluir
+                        <button type="submit" class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-2xl shadow-xl transform active:scale-95 transition-all uppercase tracking-widest italic">
+                            🚀 Salvar e Enviar Correção
                         </button>
-                        <a href="{% url 'lista_entregas' %}" class="px-8 bg-slate-100 hover:bg-slate-200 text-slate-500 font-black py-4 rounded-xl transition uppercase text-center">
+                        <a href="{% url 'lista_entregas' %}" class="px-8 bg-slate-100 hover:bg-slate-200 text-slate-500 font-black py-5 rounded-2xl transition uppercase text-center flex items-center justify-center">
                             Cancelar
                         </a>
                     </div>
