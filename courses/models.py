@@ -33,6 +33,8 @@ class Entrega(models.Model):
     feedback = models.TextField(verbose_name="Feedback do Professor", blank=True, null=True)
     nota = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
+    xp = models.IntegerField(default=0, editable=False)
+
     data_entrega = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -40,6 +42,16 @@ class Entrega(models.Model):
         verbose_name_plural = 'Entregas'
         ordering = ['-data_entrega']
 
+    def save(self, *args, **kwargs):
+        # Define o XP antes de salvar no banco
+        if self.tentativa_numero == 1:
+            self.xp = 10
+        else:
+            self.xp = 15
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.aluno.user.username} - {self.licao.titulo} (T#{self.tentativa_numero})"
 
 @receiver(post_save, sender=Entrega)
 def verificar_medalhas(sender, instance, **kwargs):
