@@ -27,14 +27,14 @@ class Entrega(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='minhas_entregas')
     tentativa_numero = models.PositiveIntegerField(default=1, verbose_name="Tentativa Nº")
     resposta_texto = models.TextField(verbose_name="Resposta do Aluno", blank=True)
-    codigo_enviado = models.TextField(verbose_name="Código/Script", blank=True)
 
     # Parte do Professor
     feedback = models.TextField(verbose_name="Feedback do Professor", blank=True, null=True)
     nota = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
-    xp = models.IntegerField(default=0, editable=False)
+    acertou = models.BooleanField(default=False, verbose_name="O aluno acertou?")
 
+    xp = models.IntegerField(default=0, editable=False)
     data_entrega = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -43,15 +43,25 @@ class Entrega(models.Model):
         ordering = ['-data_entrega']
 
     def save(self, *args, **kwargs):
-        # Define o XP antes de salvar no banco
-        if self.tentativa_numero == 1:
-            self.xp = 10
-        else:
-            self.xp = 15
+        # 1. Define o XP base no momento do envio (criação)
+        if not self.pk:
+            # Define o XP fixo baseado na tentativa no momento do envio
+            if self.tentativa_numero == 1:
+                self.xp = 10
+            else:
+                self.xp = 15
+
+        # Se o professor marcar que acertou, garantimos que a nota seja 10 (opcional, mas ajuda)
+        if self.acertou:
+            self.nota = 10.00
+            if self.xp < 15:
+                self.xp = 15
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.aluno.user.username} - {self.licao.titulo} (T#{self.tentativa_numero})"
+        status = "ACERTOU" if self.acertou else "ERROU/PENDENTE"
+        return f"{self.aluno.user.username} - {self.licao.titulo} (T#{self.tentativa_numero}) - {status}"
 
 @receiver(post_save, sender=Entrega)
 def verificar_medalhas(sender, instance, **kwargs):

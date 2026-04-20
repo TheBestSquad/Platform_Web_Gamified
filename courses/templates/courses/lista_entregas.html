@@ -30,7 +30,7 @@
                 <tbody class="divide-y divide-slate-100">
                     {% for e in entregas %}
                     <tr class="hover:bg-slate-50 transition-colors group cursor-pointer"
-                        onclick="openModal('{{ e.aluno.user.get_full_name|default:e.aluno.user.username|escapejs }}', '{{ e.licao.titulo|escapejs }}', '{{ e.tentativa_numero }}', '{{ e.resposta_texto|escapejs }}', '{{ e.codigo_enviado|escapejs }}', '{{ e.feedback|escapejs }}')">
+                        onclick="openModal('{{ e.aluno.user.get_full_name|default:e.aluno.user.username|escapejs }}', '{{ e.licao.titulo|escapejs }}', '{{ e.tentativa_numero }}', '{{ e.resposta_texto|escapejs }}', '{{ e.feedback|escapejs }}')">
 
                         <td class="px-6 py-4">
                             <span class="font-bold text-slate-800 block">{{ e.aluno.user.get_full_name|default:e.aluno.user.username }}</span>
@@ -94,7 +94,7 @@
     </div>
 </div>
 
-{# MODAL DE DETALHES #}
+{# MODAL DE DETALHES (ATUALIZADO SEM CAMPO DE CÓDIGO) #}
 <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl border-4 border-slate-800 shadow-2xl overflow-hidden flex flex-col">
 
@@ -114,12 +114,7 @@
                 <div id="modalResponse" class="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100 text-slate-700 leading-relaxed text-sm whitespace-pre-wrap"></div>
             </div>
 
-            <div>
-                <h4 class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">● Código Enviado:</h4>
-                <div class="bg-slate-900 rounded-2xl p-6 shadow-inner relative">
-                    <pre id="modalCode" class="text-green-400 font-mono text-xs overflow-x-auto leading-relaxed"></pre>
-                </div>
-            </div>
+            {# O CAMPO DE CÓDIGO FOI REMOVIDO DAQUI #}
 
             <div id="modalFeedbackSection" class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100">
                 <h4 class="text-[10px] font-black text-blue-700 uppercase mb-2 tracking-widest">● Feedback Enviado:</h4>
@@ -134,11 +129,10 @@
 </div>
 
 <script>
-function openModal(aluno, licao, tentativa, resposta, codigo, feedback) {
+function openModal(aluno, licao, tentativa, resposta, feedback) {
     document.getElementById('modalTitle').innerText = aluno + " | " + licao;
     document.getElementById('modalSubtitle').innerText = "Visualizando Tentativa #" + tentativa;
     document.getElementById('modalResponse').innerText = resposta;
-    document.getElementById('modalCode').innerText = codigo || "# Nenhum código foi enviado nesta tentativa.";
 
     // Trata o feedback nulo ou vazio
     const feedbackText = (feedback && feedback !== "None" && feedback !== "") ? feedback : "Aguardando correção do professor...";

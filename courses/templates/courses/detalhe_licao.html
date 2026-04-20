@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{# GRID SUPERIOR: CONTEÚDO E ENVIO (DUAS COLUNAS) #}
+{# Pegamos a última entrega para verificar se o aluno já acertou #}
+{% with ultima_entrega=tentativas.first %}
+
+{# GRID SUPERIOR: CONTEÚDO E ENVIO #}
 <div class="flex flex-col lg:flex-row gap-6 mb-8">
 
     {# COLUNA ESQUERDA: CONTEÚDO DA LIÇÃO #}
@@ -29,7 +32,7 @@
         {% endif %}
     </div>
 
-    {# COLUNA DIREITA: FORMULÁRIO DE ENVIO #}
+    {# COLUNA DIREITA: FORMULÁRIO OU STATUS #}
     <div class="lg:w-1/2 flex flex-col gap-4">
         {% if perfil == 'professor' %}
             <div class="bg-white rounded-2xl border-4 border-blue-600 p-8 shadow-sm h-full">
@@ -43,34 +46,42 @@
         {% else %}
             <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm h-full flex flex-col">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-lg text-slate-800">Nova Tentativa:</h3>
-                    <span class="px-3 py-1 bg-blue-600 rounded-full text-[10px] font-black text-white uppercase tracking-widest">
-                        {{ tentativas.count }} / 3 Realizadas
+                    <h3 class="font-bold text-lg text-slate-800">Status da Atividade:</h3>
+                    <span class="px-3 py-1 {% if ultima_entrega.acertou %}bg-green-500{% else %}bg-blue-600{% endif %} rounded-full text-[10px] font-black text-white uppercase tracking-widest">
+                        {% if ultima_entrega.acertou %}CONCLUÍDA{% else %}{{ tentativas.count }} / 3 Tentativas{% endif %}
                     </span>
                 </div>
 
-                {% if tentativas.count < 3 %}
+                {# LÓGICA DE EXIBIÇÃO DO FORMULÁRIO #}
+                {% if ultima_entrega.acertou %}
+                    {# ALUNO ACERTOU: MOSTRA SUCESSO #}
+                    <div class="flex-grow flex flex-col items-center justify-center p-8 bg-green-50 border-2 border-green-200 rounded-2xl text-center">
+                        <span class="text-5xl block mb-4">🎯</span>
+                        <p class="text-green-800 font-black text-lg uppercase italic">Lição Concluída!</p>
+                        <p class="text-green-600 text-[11px] mt-2 font-bold uppercase">O professor validou sua resposta. Excelente trabalho!</p>
+                    </div>
+                {% elif tentativas.count < 3 %}
+                    {# AINDA TEM TENTATIVAS: MOSTRA FORMULÁRIO (SEM CÓDIGO) #}
                     <form method="POST" class="space-y-4 flex-grow">
                         {% csrf_token %}
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Sua Explicação:</label>
-                            <textarea name="resposta" required class="w-full border-2 border-slate-100 rounded-xl p-4 outline-none focus:border-blue-500 transition" rows="3"></textarea>
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Sua Resposta/Explicação:</label>
+                            <textarea name="resposta" required
+                                      placeholder="Escreva sua resposta detalhadamente aqui..."
+                                      class="w-full border-4 border-slate-100 rounded-2xl p-4 outline-none focus:border-blue-500 transition text-slate-700"
+                                      rows="10"></textarea>
                         </div>
 
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Terminal Python:</label>
-                            <textarea name="codigo" class="w-full bg-slate-900 text-green-400 font-mono p-4 rounded-xl border-4 border-slate-800 outline-none h-40 shadow-inner" placeholder="# Insira o código aqui..."></textarea>
-                        </div>
-
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest italic">
                             ENVIAR TENTATIVA {{ tentativas.count|add:1 }}
                         </button>
                     </form>
                 {% else %}
+                    {# TENTATIVAS ESGOTADAS E NÃO ACERTOU #}
                     <div class="flex-grow flex flex-col items-center justify-center p-8 bg-red-50 border-2 border-red-200 rounded-2xl text-center">
                         <span class="text-3xl block mb-2">🚫</span>
-                        <p class="text-red-800 font-black text-sm uppercase">Limite Atingido</p>
-                        <p class="text-red-600 text-[10px] mt-2 italic">Você já explorou as 3 tentativas permitidas.</p>
+                        <p class="text-red-800 font-black text-sm uppercase">Tentativas Esgotadas</p>
+                        <p class="text-red-600 text-[10px] mt-2 italic">O professor enviou o feedback final para suas 3 tentativas.</p>
                     </div>
                 {% endif %}
             </div>
@@ -78,7 +89,7 @@
     </div>
 </div>
 
-{# SEÇÃO INFERIOR: PERCURSO EM LARGURA TOTAL (VERTICALIZADO) #}
+{# SEÇÃO INFERIOR: PERCURSO #}
 {% if perfil == 'aluno' %}
 <div class="mt-12 space-y-8 pb-12">
     <div class="flex items-center gap-4">
@@ -89,35 +100,29 @@
 
     <div class="space-y-8">
         {% for e in tentativas %}
-            <div class="bg-white rounded-2xl border-4 border-slate-100 shadow-sm overflow-hidden">
-                {# CABEÇALHO DA TENTATIVA #}
-                <div class="bg-slate-800 px-6 py-3 flex justify-between items-center">
-                    <span class="font-black text-xs uppercase text-white tracking-widest">TENTATIVA #{{ e.tentativa_numero }}</span>
-                    <span class="text-[10px] text-slate-400 font-bold">{{ e.data_entrega|date:"d/m/Y - H:i" }}</span>
+            <div class="bg-white rounded-2xl border-4 {% if e.acertou %}border-green-200{% else %}border-slate-100{% endif %} shadow-sm overflow-hidden">
+                {# CABEÇALHO #}
+                <div class="{% if e.acertou %}bg-green-600{% else %}bg-slate-800{% endif %} px-6 py-3 flex justify-between items-center">
+                    <span class="font-black text-xs uppercase text-white tracking-widest">
+                        TENTATIVA #{{ e.tentativa_numero }} {% if e.acertou %}(CORRETA ✅){% endif %}
+                    </span>
+                    <span class="text-[10px] text-white/60 font-bold">{{ e.data_entrega|date:"d/m/Y - H:i" }}</span>
                 </div>
 
-                <div class="p-8 space-y-8">
-                    {# 1. RESPOSTA #}
+                <div class="p-8 space-y-6">
+                    {# RESPOSTA #}
                     <div>
-                        <h4 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-wider">● Resposta do Aluno:</h4>
+                        <h4 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-wider">● Sua Resposta:</h4>
                         <div class="text-slate-700 text-base leading-relaxed pl-4 border-l-2 border-slate-100">
                             {{ e.resposta_texto|linebreaks }}
                         </div>
                     </div>
 
-                    {# 2. CÓDIGO/SCRIPT #}
-                    {% if e.codigo_enviado %}
-                    <div>
-                        <h4 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-wider">● Código / Script:</h4>
-                        <div class="bg-slate-900 rounded-xl p-6 shadow-inner">
-                            <pre class="text-green-400 font-mono text-sm overflow-x-auto leading-relaxed"><code>{{ e.codigo_enviado }}</code></pre>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {# 3. FEEDBACK DO PROFESSOR #}
-                    <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100">
-                        <h4 class="text-[11px] font-black text-blue-700 uppercase mb-3 tracking-wider">● Comentários do Professor:</h4>
+                    {# FEEDBACK #}
+                    <div class="{% if e.acertou %}bg-green-50 border-green-100{% else %}bg-blue-50 border-blue-100{% endif %} rounded-2xl p-6 border-2">
+                        <h4 class="text-[11px] font-black {% if e.acertou %}text-green-700{% else %}text-blue-700{% endif %} uppercase mb-3 tracking-wider">
+                            ● Feedback do Professor:
+                        </h4>
                         <div class="pl-4">
                             {% if e.feedback %}
                                 <p class="text-slate-800 text-sm italic leading-relaxed">"{{ e.feedback }}"</p>
@@ -135,4 +140,5 @@
     </div>
 </div>
 {% endif %}
+{% endwith %}
 {% endblock %}

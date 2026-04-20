@@ -44,19 +44,23 @@ def detalhe_licao(request, licao_id):
         entrega_recente = entregas.first()
 
         if request.method == 'POST':
+            # TRAVA 1: Se já atingiu 3 tentativas
             if tentativas_atuais >= 3:
                 messages.error(request, 'Você já atingiu o limite de 3 tentativas para esta lição')
                 return redirect('detalhe_licao', licao_id=licao.id)
 
+            # TRAVA 2: Se o professor já marcou como ACERTOU na entrega anterior
+            if entrega_recente and entrega_recente.acertou:
+                messages.error(request, 'Você já concluiu esta lição com sucesso!')
+                return redirect('detalhe_licao', licao_id=licao.id)
+
             resposta = request.POST.get('resposta')
-            codigo = request.POST.get('codigo')
 
             # Salva ou atualiza a resposta
             Entrega.objects.create(
                 licao=licao,
                 aluno=aluno,
                 resposta_texto=resposta,
-                codigo_enviado=codigo,
                 tentativa_numero=tentativas_atuais + 1,
             )
             # Redireciona para a PRÓPRIA página para evitar reenvio de formulário no F5
@@ -107,7 +111,13 @@ def dar_feedback(request, entrega_id):
 
     if request.method == 'POST':
         feedback = request.POST.get('feedback')
+        acertou_status = request.POST.get('acertou') == 'on'
         entrega.feedback = feedback
+        entrega.acertou = acertou_status
+
+        if acertou_status:
+            entrega.nota = 10
+
         entrega.save()
         messages.success(request, f'Feedback enviado para {entrega.aluno}!')
         return redirect('lista_entregas')
