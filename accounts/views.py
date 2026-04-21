@@ -171,7 +171,8 @@ def lista_alunos_professor(request):
     ).select_related('aluno__user')  # Otimiza a busca dos nomes
 
     return render(request, 'accounts/lista_alunos.html', {
-        'matriculas': matriculas  # Mudamos o nome da variável para facilitar no HTML
+        'matriculas': matriculas, # Mudamos o nome da variável para facilitar no HTML
+        'total_alunos': matriculas.count(),
     })
 
 @login_required
