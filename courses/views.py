@@ -54,6 +54,12 @@ def detalhe_licao(request, licao_id):
                 messages.error(request, 'Você já concluiu esta lição com sucesso!')
                 return redirect('detalhe_licao', licao_id=licao.id)
 
+            # --- NOVA TRAVA 3: Aguardar Feedback ---
+            # Se existe uma entrega e o campo feedback está vazio/None
+            if entrega_recente and not entrega_recente.feedback:
+                messages.warning(request,'Aguarde o feedback do professor sobre sua última tentativa antes de enviar uma nova.')
+                return redirect('detalhe_licao', licao_id=licao.id)
+
             resposta = request.POST.get('resposta')
 
             # Salva ou atualiza a resposta
@@ -83,6 +89,7 @@ def detalhe_licao(request, licao_id):
         'entrega': entrega_recente,
         'perfil': perfil,
         'tentativas': entregas,
+        'ultima_entrega': entrega_recente,
     })
 
 
