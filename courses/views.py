@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
+from django.urls import reverse
 from .forms import LicaoForm
 from .models import Licao, Entrega
-from accounts.models import Aluno, Professor
+from accounts.models import Aluno, Professor, Notificacao
 
 
 @login_required
@@ -69,6 +70,13 @@ def detalhe_licao(request, licao_id):
                 resposta_texto=resposta,
                 tentativa_numero=tentativas_atuais + 1,
             )
+
+            Notificacao.objects.create(
+                user=licao.professor.user,
+                mensagem=f"O aluno {request.user.get_full_name()} enviou a tentativa #{tentativas_atuais + 1} em {licao.titulo}.",
+                link=reverse('lista_entregas')
+            )
+
             # Redireciona para a PRÓPRIA página para evitar reenvio de formulário no F5
             messages.success(request, f'Tentativa {tentativas_atuais + 1} enviada com sucesso!')
             return redirect('home')
@@ -126,6 +134,15 @@ def dar_feedback(request, entrega_id):
             entrega.nota = 10
 
         entrega.save()
+
+        status_texto = "e aprovou sua resposta! ✅" if acertou_status else "e enviou orientações."
+
+        Notificacao.objects.create(
+            user=entrega.aluno.user,
+            mensagem=f"O professor corrigiu a lição '{entrega.licao.titulo}' {status_texto}",
+            link=reverse('detalhe_licao', kwargs={'licao_id': entrega.licao.id}) 
+        )
+
         messages.success(request, f'Feedback enviado para {entrega.aluno}!')
         return redirect('lista_entregas')
 
