@@ -8,4 +8,5 @@ urlpatterns = [
     path('aprovar-aluno/<int:aluno_id>/', views.aprovar_aluno, name='aprovar_aluno'),
     path('meus-alunos/', views.lista_alunos_professor, name='lista_alunos'),
     path('perfil/', views.editar_perfil, name='editar_perfil'),
+    path('notificacoes/lidas/', views.marcar_notificacoes_lidas, name='marcar_notificacoes_lidas'),
 ]

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg
-from .models import Professor, Aluno, Matricula
+from .models import Professor, Aluno, Matricula, Notificacao
 from courses.models import Licao, Entrega
 
 
@@ -205,3 +205,12 @@ def editar_perfil(request):
         'perfil_form': perfil_form, # Passamos o form de perfil para o template
         'perfil': perfil
     })
+
+
+@login_required
+def marcar_notificacoes_lidas(request):
+    # Filtra todas as notificações do usuário logado que ainda não foram lidas e as marca como True
+    Notificacao.objects.filter(user=request.user, lida=False).update(lida=True)
+
+    # Redireciona o usuário de volta para a página onde ele estava
+    return redirect(request.META.get('HTTP_REFERER', 'home'))

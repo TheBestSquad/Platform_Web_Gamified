@@ -103,3 +103,20 @@ class Medalha(models.Model):
         verbose_name = 'Medalha'
         verbose_name_plural = 'Medalhas'
 
+
+class Notificacao(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacao')
+    mensagem = models.CharField(max_length=255)
+    link = models.CharField(max_length=255, blank=True, null=True)
+    lida = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-data_criacao']
+        verbose_name = 'Notificação'
+        verbose_name_plural = 'Notificações'
+
+    def __str__(self):
+        return f'Notificação para {self.user.username}: {self.mensagem}'
+
+

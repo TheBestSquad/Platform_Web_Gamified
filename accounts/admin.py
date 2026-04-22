@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Professor, Aluno, Medalha, Matricula
+from .models import Professor, Aluno, Medalha, Matricula, Notificacao
 
 
 @admin.register(Professor)
@@ -40,4 +40,12 @@ class MedalhaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'aluno', 'tipo', 'data_conquista')
     list_filter = ('tipo', 'data_conquista')
     search_fields = ('aluno__user__first_name', 'titulo')
+
+
+@admin.register(Notificacao)
+class NotificacaoAdmin(admin.ModelAdmin):
+    list_display = ('user', 'mensagem', 'data_criacao', 'lida')
+    list_filter = ('lida', 'data_criacao')
+    serach_fields = ('user__username', 'mensagem')
+
 
