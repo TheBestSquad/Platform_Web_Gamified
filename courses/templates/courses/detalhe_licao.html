@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{# Pegamos a última entrega para verificar status #}
+{% with ultima_entrega=tentativas.first %}
+
+{# GRID SUPERIOR: CONTEÚDO E ENVIO (DUAS COLUNAS) #}
+<div class="flex flex-col lg:flex-row gap-6 mb-8">
+
+    {# COLUNA ESQUERDA: CONTEÚDO DA LIÇÃO #}
+    <div class="lg:w-1/2 bg-white rounded-2xl border-4 border-slate-800 p-8 shadow-2xl overflow-y-auto max-h-[600px]">
+        <h1 class="text-2xl font-black mb-4 uppercase tracking-tighter">{{ licao.titulo }}</h1>
+
+        <div class="prose max-w-none text-slate-700 mb-8">
+            <h3 class="text-sm font-black text-slate-400 uppercase mb-2">Descrição da Lição:</h3>
+            {{ licao.descricao|linebreaks }}
+        </div>
+
+        {% if licao.questoes %}
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-xl mb-6">
+                <h3 class="text-blue-800 font-black uppercase text-xs mb-3 tracking-widest">❓ Questões para Resolver:</h3>
+                <div class="text-slate-800 font-medium">{{ licao.questoes|linebreaks }}</div>
+            </div>
+        {% endif %}
+
+        {% if licao.arquivo %}
+            <div class="mt-6 p-4 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
+                <a href="{{ licao.arquivo.url }}" target="_blank" class="text-blue-600 font-bold underline flex items-center">
+                    <span class="mr-2">📎</span> Baixar Material de Apoio
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# COLUNA DIREITA: FORMULÁRIO OU STATUS #}
+    <div class="lg:w-1/2 flex flex-col gap-4">
+        {% if perfil == 'professor' %}
+            <div class="bg-white rounded-2xl border-4 border-blue-600 p-8 shadow-sm h-full">
+                <h3 class="font-black text-xl text-slate-800 uppercase italic mb-4">Modo Docente</h3>
+                <p class="text-slate-600 mb-6">Visualize o conteúdo e gerencie as entregas dos seus alunos.</p>
+                <div class="space-y-4">
+                    <a href="{% url 'lista_entregas' %}" class="block text-center bg-slate-800 text-white font-bold py-3 rounded-xl shadow-lg">Ver Entregas</a>
+                    <a href="{% url 'home' %}" class="block text-center border-2 border-slate-200 text-slate-500 font-bold py-3 rounded-xl hover:bg-slate-50 transition">Voltar para Dashboard</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm h-full flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-lg text-slate-800">Status da Atividade:</h3>
+                    <span class="px-3 py-1 {% if ultima_entrega.acertou %}bg-green-500{% else %}bg-blue-600{% endif %} rounded-full text-[10px] font-black text-white uppercase tracking-widest">
+                        {% if ultima_entrega.acertou %}CONCLUÍDA{% else %}{{ tentativas.count }} / 3 Tentativas{% endif %}
+                    </span>
+                </div>
+
+                {# LÓGICA DE EXIBIÇÃO DO FORMULÁRIO (COM TRAVA DE FEEDBACK) #}
+                {% if ultima_entrega.acertou %}
+                    {# ALUNO ACERTOU: SUCESSO TOTAL #}
+                    <div class="flex-grow flex flex-col items-center justify-center p-8 bg-green-50 border-2 border-green-200 rounded-2xl text-center">
+                        <span class="text-5xl block mb-4">🎯</span>
+                        <p class="text-green-800 font-black text-lg uppercase italic">Lição Concluída!</p>
+                        <p class="text-green-600 text-[11px] mt-2 font-bold uppercase">O professor validou sua resposta. Excelente trabalho!</p>
+                    </div>
+
+                {% elif tentativas.count < 3 %}
+
+                    {% if ultima_entrega and not ultima_entrega.feedback %}
+                        {# TRAVA: ENVIADO, MAS SEM FEEDBACK DO PROFESSOR #}
+                        <div class="flex-grow flex flex-col items-center justify-center p-8 bg-indigo-50 border-2 border-indigo-100 rounded-2xl text-center">
+                            <div class="relative mb-4">
+                                <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                                <span class="absolute inset-0 flex items-center justify-center text-xs">⏳</span>
+                            </div>
+                            <p class="text-indigo-800 font-black text-sm uppercase italic italic">Análise em Andamento</p>
+                            <p class="text-indigo-500 text-[10px] mt-2 font-medium">
+                                Você já enviou a **tentativa #{{ tentativas.count }}**. <br>
+                                Aguarde o feedback do professor para liberar a próxima.
+                            </p>
+                        </div>
+                    {% else %}
+                        {# LIBERADO PARA ENVIAR PRÓXIMA TENTATIVA #}
+                        <form method="POST" class="space-y-4 flex-grow">
+                            {% csrf_token %}
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Sua Resposta/Explicação:</label>
+                                <textarea name="resposta" required
+                                          placeholder="Escreva sua resposta detalhadamente aqui..."
+                                          class="w-full border-4 border-slate-100 rounded-2xl p-4 outline-none focus:border-blue-500 transition text-slate-700 font-medium"
+                                          rows="10"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest italic">
+                                ENVIAR TENTATIVA {{ tentativas.count|add:1 }}
+                            </button>
+                        </form>
+                    {% endif %}
+
+                {% else %}
+                    {# TENTATIVAS ESGOTADAS E NÃO ACERTOU #}
+                    <div class="flex-grow flex flex-col items-center justify-center p-8 bg-red-50 border-2 border-red-200 rounded-2xl text-center">
+                        <span class="text-3xl block mb-2">🚫</span>
+                        <p class="text-red-800 font-black text-sm uppercase">Tentativas Esgotadas</p>
+                        <p class="text-red-600 text-[10px] mt-2 italic font-bold">O professor enviou o feedback final para suas 3 tentativas.</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{# SEÇÃO INFERIOR: PERCURSO #}
+{% if perfil == 'aluno' %}
+<div class="mt-12 space-y-8 pb-12">
+    <div class="flex items-center gap-4">
+        <span class="h-[2px] bg-slate-200 flex-grow"></span>
+        <h3 class="font-black text-slate-800 uppercase tracking-[0.2em] text-sm italic">📜 SEU PERCURSO NESTA LIÇÃO</h3>
+        <span class="h-[2px] bg-slate-200 flex-grow"></span>
+    </div>
+
+    <div class="space-y-8">
+        {% for e in tentativas %}
+            <div class="bg-white rounded-2xl border-4 {% if e.acertou %}border-green-200{% else %}border-slate-100{% endif %} shadow-sm overflow-hidden">
+                {# CABEÇALHO DA TENTATIVA #}
+                <div class="{% if e.acertou %}bg-green-600{% else %}bg-slate-800{% endif %} px-6 py-3 flex justify-between items-center">
+                    <span class="font-black text-xs uppercase text-white tracking-widest">
+                        TENTATIVA #{{ e.tentativa_numero }} {% if e.acertou %}(CORRETA ✅){% endif %}
+                    </span>
+                    <span class="text-[10px] text-white/60 font-bold">{{ e.data_entrega|date:"d/m/Y - H:i" }}</span>
+                </div>
+
+                <div class="p-8 space-y-8">
+                    {# 1. RESPOSTA #}
+                    <div>
+                        <h4 class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-wider">● Sua Resposta:</h4>
+                        <div class="text-slate-700 text-base leading-relaxed pl-4 border-l-2 border-slate-100">
+                            {{ e.resposta_texto|linebreaks }}
+                        </div>
+                    </div>
+
+                    {# 2. FEEDBACK DO PROFESSOR (COM LÓGICA DE ENCERRAMENTO) #}
+                    <div class="rounded-2xl p-6 border-2 transition-all
+                        {% if e.acertou %}
+                            bg-green-50 border-green-100
+                        {% elif e.tentativa_numero == 3 %}
+                            bg-amber-50 border-amber-200 shadow-inner
+                        {% else %}
+                            bg-blue-50 border-blue-100
+                        {% endif %}">
+
+                        <h4 class="text-[11px] font-black uppercase mb-3 tracking-wider
+                            {% if e.acertou %}
+                                text-green-700
+                            {% elif e.tentativa_numero == 3 %}
+                                text-amber-700
+                            {% else %}
+                                text-blue-700
+                            {% endif %}">
+                            ● {% if e.tentativa_numero == 3 and not e.acertou %}FEEDBACK DE ENCERRAMENTO:{% else %}Feedback do Professor:{% endif %}
+                        </h4>
+
+                        <div class="pl-4">
+                            {% if e.feedback %}
+                                <p class="text-slate-800 text-sm italic leading-relaxed">"{{ e.feedback }}"</p>
+                                {% if e.tentativa_numero == 3 and not e.acertou %}
+                                    <div class="mt-4 pt-4 border-t border-amber-200">
+                                        <span class="text-[9px] font-black text-amber-600 uppercase tracking-widest">
+                                            ⚠️ Ciclo de tentativas finalizado para esta lição. Verifique a correção acima.
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="flex items-center text-slate-400 text-xs italic">
+                                    <svg class="w-4 h-4 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+                                    Aguardando análise do professor...
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+{% endblock %}

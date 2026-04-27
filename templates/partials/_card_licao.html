@@ -1,0 +1,32 @@
+<div class="bg-white border-2 border-slate-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+    <div>
+        <div class="flex justify-between items-start mb-4">
+            <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">
+                {{ licao.professor.disciplina_curso }}
+            </span>
+            <span class="text-gray-400 text-xs">{{ licao.data_criacao|date:"d M" }}</span>
+        </div>
+        <a href="{% url 'detalhe_licao' licao.id %}" class="hover:text-blue-600 transition">
+            <h4 class="text-lg font-bold text-slate-800 mb-2 leading-tight">{{ licao.titulo }}</h4>
+        </a>
+        <p class="text-gray-500 text-sm mb-4 line-clamp-3">{{ licao.descricao }}</p>
+    </div>
+
+    <div class="space-y-2 mt-4">
+        {% if perfil == 'professor' %}
+            <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-slate-800 hover:bg-black text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                👁️ Visualizar Lição
+            </a>
+        {% else %}
+            {% if licao.id in entregas_feitas %}
+                <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                    ✅ Ver Nota e Feedback
+                </a>
+            {% else %}
+                <a href="{% url 'detalhe_licao' licao.id %}" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                    🚀 Abrir Lição e Responder
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,88 @@
+<nav class="bg-blue-600 p-4 text-white shadow-lg relative z-50">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="{% url 'home' %}" class="font-bold text-xl tracking-tight">EduDash</a>
+
+        <div class="space-x-4 flex items-center">
+            {% if user.is_authenticated %}
+
+                <div class="relative group">
+                    <button class="relative p-2 text-blue-100 hover:text-white hover:bg-blue-700 rounded-full transition-all focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+
+                        {% if contador_notificacoes > 0 %}
+                            <span class="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-black leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full border border-blue-600 shadow-sm">
+                                {{ contador_notificacoes }}
+                            </span>
+                        {% endif %}
+                    </button>
+
+                    <div class="absolute right-0 mt-1 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div class="px-4 py-2 border-b border-slate-50 flex justify-between items-center">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Notificações</h4>
+                            {% if contador_notificacoes > 0 %}
+                                <span class="text-[9px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">{{ contador_notificacoes }} novas</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="max-h-80 overflow-y-auto">
+                            {% for notif in notificacoes_recentes %}
+                                <a href="{{ notif.link|default:'#' }}" class="block px-4 py-3 hover:bg-blue-50 transition border-b border-slate-50 last:border-0 group/item">
+                                    <p class="text-xs text-slate-700 font-medium leading-tight group-hover/item:text-blue-700">{{ notif.mensagem }}</p>
+                                    <span class="text-[9px] text-slate-400 mt-1 block font-semibold uppercase">{{ notif.data_criacao|timesince }} atrás</span>
+                                </a>
+                            {% empty %}
+                                <div class="text-center py-8">
+                                    <span class="text-2xl block mb-2">🎉</span>
+                                    <p class="text-xs text-slate-400 italic font-medium">Tudo em dia por aqui!</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {# MUDANÇA AQUI: Botão para marcar como lidas #}
+                        {% if notificacoes_recentes %}
+                            <div class="pt-2 px-2">
+                                <a href="{% url 'marcar_notificacoes_lidas' %}" class="block text-center py-2 text-[10px] font-black text-blue-600 uppercase hover:bg-blue-50 rounded-lg transition-colors tracking-widest">
+                                    Marcar todas como lidas
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <a href="{% url 'editar_perfil' %}" class="flex items-center gap-2 hover:bg-blue-700 px-3 py-1 rounded-full transition border border-blue-400">
+                    <div class="w-6 h-6 rounded-full bg-blue-400 overflow-hidden flex items-center justify-center border border-white">
+                        {% if user.professor_profile.foto or user.aluno_profile.foto %}
+                            <img src="{{ user.professor_profile.foto.url|default:user.aluno_profile.foto.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <span class="text-[10px] font-bold">{{ user.first_name|first }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="text-sm font-medium">Meu Perfil</span>
+                </a>
+
+                <a href="{% url 'ranking' %}" class="hover:bg-blue-700 px-3 py-1 rounded text-sm transition font-bold flex items-center">
+                    <span class="mr-1">🏆</span> Ranking
+                </a>
+
+                {% if user.professor_profile %}
+                    <a href="{% url 'lista_alunos' %}" class="hover:bg-blue-700 px-3 py-1 rounded text-sm transition border border-blue-400">
+                        Meus Alunos
+                    </a>
+                    <a href="{% url 'lista_entregas' %}" class="hover:bg-blue-700 px-3 py-1 rounded text-sm transition border border-blue-400">
+                        Minhas Correções
+                    </a>
+                {% endif %}
+
+                <form action="{% url 'logout' %}" method="post" class="inline ml-2">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition font-bold uppercase text-[10px] tracking-widest">Sair</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="hover:underline text-sm font-bold">Login</a>
+                <a href="{% url 'register_professor' %}" class="bg-white text-blue-600 px-4 py-2 rounded-full font-black text-xs uppercase tracking-widest shadow-md hover:bg-blue-50 transition-all">Sou Professor</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
