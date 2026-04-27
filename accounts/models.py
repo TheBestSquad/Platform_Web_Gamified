@@ -5,12 +5,16 @@ from django.db.models.functions import Coalesce
 
 
 class Professor(models.Model):
+<<<<<<< HEAD
     """
     Representa o perfil complementar para usuários do tipo Professor.
 
     Armazena informações acadêmicas e profissionais, além de vincular
     o perfil ao modelo de usuário padrão do Django.
     """
+=======
+    # O OneToOneField liga o perfil a um usuário do sistema (que tem login e senha)
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='professor_profile')
     formacao = models.CharField(max_length=255)
     contato = models.CharField(max_length=100)
@@ -26,12 +30,15 @@ class Professor(models.Model):
 
 
 class Aluno(models.Model):
+<<<<<<< HEAD
     """
     Representa o perfil complementar para usuários do tipo Aluno.
 
     Contém a lógica de gamificação (XP, Níveis e Progresso) e gerencia
     o relacionamento com os professores através de matrículas.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='aluno_profile')
     contato = models.CharField(max_length=20)
     professores = models.ManyToManyField(Professor, through='Matricula', related_name='alunos')
@@ -41,6 +48,7 @@ class Aluno(models.Model):
 
     @property
     def xp_total(self):
+<<<<<<< HEAD
         """
         Calcula o total de experiência (XP) acumulado pelo aluno.
 
@@ -51,6 +59,8 @@ class Aluno(models.Model):
         Returns:
             int: Total de XP calculado.
         """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
         entregas = self.minhas_entregas.all()
         total_xp = 0
         for entrega in entregas:
@@ -62,6 +72,7 @@ class Aluno(models.Model):
 
     @property
     def nivel_info(self):
+<<<<<<< HEAD
         """
         Define o nível atual do aluno com base no XP acumulado.
 
@@ -69,6 +80,8 @@ class Aluno(models.Model):
             dict: Dicionário contendo nome do nível, cor para UI,
             XP necessário para o próximo nível e XP mínimo do nível atual.
         """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
         xp = self.xp_total
         # Definição das faixas (ajuste conforme o grupo preferir)
         if xp < 100:
@@ -80,12 +93,15 @@ class Aluno(models.Model):
 
     @property
     def progresso_nivel(self):
+<<<<<<< HEAD
         """
         Calcula a porcentagem de progresso do aluno dentro do seu nível atual.
 
         Returns:
             float: Valor entre 0 e 100 representando a barra de progresso.
         """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
         info = self.nivel_info
         xp_atual = self.xp_total
 
@@ -107,12 +123,15 @@ class Aluno(models.Model):
 
 
 class Matricula(models.Model):
+<<<<<<< HEAD
     """
     Tabela intermediária que gerencia o vínculo entre Aluno e Professor.
 
     A aprovação é individualizada por professor, permitindo que um aluno
     esteja vinculado a vários docentes de forma independente.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
     data_vinculo = models.DateTimeField(auto_now_add=True)
@@ -125,12 +144,15 @@ class Matricula(models.Model):
 
 
 class Medalha(models.Model):
+<<<<<<< HEAD
     """
     Representa conquistas alcançadas pelos alunos no sistema.
 
     As medalhas são categorizadas por tipo (Domínio, Prática ou Evolução)
     e servem como feedback positivo para o engajamento escolar.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     TIPOS = [
         ('DOMINIO', 'Domínio Total'),  # Para quem tirou 100
         ('PRATICA', 'Mão na Massa'),  # Para quem completou tudo
@@ -151,12 +173,15 @@ class Medalha(models.Model):
 
 
 class Notificacao(models.Model):
+<<<<<<< HEAD
     """
     Sistema interno de alertas para os usuários.
 
     Utilizado para avisar alunos sobre aprovações, novas missões
     ou correções de atividades feitas pelos professores.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacao')
     mensagem = models.CharField(max_length=255)
     link = models.CharField(max_length=255, blank=True, null=True)

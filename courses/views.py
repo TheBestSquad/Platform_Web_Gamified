@@ -11,12 +11,15 @@ from accounts.models import Aluno, Professor, Notificacao
 
 @login_required
 def criar_licao(request):
+<<<<<<< HEAD
     """
     Permite que um professor crie e publique uma nova lição.
 
     Verifica se o usuário possui perfil de professor e processa o formulário,
     incluindo uploads de arquivos (request.FILES).
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # Segurança: Apenas professores podem postar
     if not hasattr(request.user, 'professor_profile'):
         return redirect('home')
@@ -38,6 +41,7 @@ def criar_licao(request):
 
 @login_required
 def detalhe_licao(request, licao_id):
+<<<<<<< HEAD
     """
     Exibe os detalhes de uma lição e gerencia o envio de respostas pelos alunos.
 
@@ -48,6 +52,8 @@ def detalhe_licao(request, licao_id):
 
     Gera notificações automáticas para o professor após cada envio.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     licao = get_object_or_404(Licao, id=licao_id)
     perfil = 'aluno' if hasattr(request.user, 'aluno_profile') else 'professor'
     entregas = []
@@ -119,12 +125,15 @@ def detalhe_licao(request, licao_id):
 
 @login_required
 def lista_entregas(request):
+<<<<<<< HEAD
     """
     Lista todas as entregas realizadas nas lições do professor logado.
 
     Ordena as entregas de forma decrescente pela data para priorizar
     o que precisa de correção imediata.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # Verifica se o utilizador logado é um professor
     if hasattr(request.user, 'professor_profile'):
         # Procura todas as entregas das lições que pertencem a este professor
@@ -141,12 +150,15 @@ def lista_entregas(request):
 
 @login_required
 def dar_feedback(request, entrega_id):
+<<<<<<< HEAD
     """
     Permite que o professor avalie uma entrega, envie feedback.
 
     Se o status 'acertou' for marcado, a nota 10 é atribuída automaticamente.
     Gera uma notificação para o aluno informando sobre a correção.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     if not hasattr(request.user, 'professor_profile'):
         return redirect('home')
 
@@ -179,6 +191,7 @@ def dar_feedback(request, entrega_id):
 
 @login_required
 def ranking(request):
+<<<<<<< HEAD
     """
     Exibe o ranking de alunos baseado no XP acumulado.
 
@@ -188,6 +201,8 @@ def ranking(request):
 
     Calcula dinamicamente a posição do aluno logado dentro do ranking exibido.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     professor_id = request.GET.get('professor_id')
 
     if professor_id is None and hasattr(request.user, 'professor_profile'):

@@ -6,12 +6,15 @@ from accounts.models import Medalha
 
 
 class Licao(models.Model):
+<<<<<<< HEAD
     """
     Representa o conteúdo pedagógico postado pelo professor.
 
     Armazena o material de estudo, as questões a serem respondidas e
     suporte para arquivos ou links externos.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE, related_name='licoes')
     titulo = models.CharField(max_length=200)
     descricao = models.TextField()
@@ -29,12 +32,15 @@ class Licao(models.Model):
 
 
 class Entrega(models.Model):
+<<<<<<< HEAD
     """
     Representa a resposta de um aluno a uma lição específica.
 
     Gerencia o ciclo de vida da atividade, desde o envio da resposta
     pelo aluno até o feedback, atribuição de nota e cálculo de XP pelo professor.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     licao = models.ForeignKey(Licao, on_delete=models.CASCADE, related_name='entregas')
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='minhas_entregas')
     tentativa_numero = models.PositiveIntegerField(default=1, verbose_name="Tentativa Nº")
@@ -55,6 +61,7 @@ class Entrega(models.Model):
         ordering = ['-data_entrega']
 
     def save(self, *args, **kwargs):
+<<<<<<< HEAD
         """
         Sobrescreve o processo save para calcular o XP automaticamente.
 
@@ -63,6 +70,8 @@ class Entrega(models.Model):
             - Tentativas posteriores: 15 XP base.
             - Se o professor marcar 'acertou', garante nota 10 e mínimo de 15 XP.
         """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
         # 1. Define o XP base no momento do envio (criação)
         if not self.pk:
             # Define o XP fixo baseado na tentativa no momento do envio
@@ -85,6 +94,7 @@ class Entrega(models.Model):
 
 @receiver(post_save, sender=Entrega)
 def verificar_medalhas(sender, instance, **kwargs):
+<<<<<<< HEAD
     """
     Signal que verifica e atribui medalhas após a gravação de uma Entrega.
 
@@ -93,6 +103,8 @@ def verificar_medalhas(sender, instance, **kwargs):
         - PRÁTICA: Atribuída se o aluno completar 5 ou mais lições do mesmo professor.
         - EVOLUÇÃO: Atribuída se a nota atual for maior que a nota da entrega anterior.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # 1. Se não tem nota, para aqui
     if instance.nota is None:
         return

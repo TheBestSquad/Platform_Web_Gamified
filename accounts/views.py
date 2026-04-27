@@ -9,12 +9,15 @@ from courses.models import Licao, Entrega
 
 
 def register_professor(request):
+<<<<<<< HEAD
     """
     Realiza o cadastro de um novo professor no sistema.
 
     Cria simultaneamente um objeto User (autenticação) e um perfil de Professor.
     O e-mail fornecido é utilizado como nome de usuário para o login.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     if request.method == 'POST':
         form = ProfessorRegistrationForm(request.POST)
         if form.is_valid():
@@ -37,6 +40,7 @@ def register_professor(request):
 
 
 def register_aluno(request):
+<<<<<<< HEAD
     """
     Realiza o cadastro de um novo aluno no sistema.
 
@@ -44,6 +48,8 @@ def register_aluno(request):
     O aluno inicia com o status is_approved=False, aguardando aprovação
     dos professores selecionados no formulário (save_m2m).
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     if request.method == 'POST':
         form = AlunoRegistrationForm(request.POST)
         if form.is_valid():
@@ -70,6 +76,7 @@ def register_aluno(request):
 
 @login_required
 def home(request):
+<<<<<<< HEAD
     """
     View principal (Dashboard) que redireciona a lógica conforme o tipo de usuário.
 
@@ -77,6 +84,8 @@ def home(request):
     - Alunos: Visualizam seu progresso (XP, Nível), barra de progresso calculada
     e a lista de lições dos professores que já aprovaram seu vínculo.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     context = {}
 
     # 1. Lógica para Professor
@@ -167,12 +176,15 @@ def home(request):
 
 @login_required
 def aprovar_aluno(request, aluno_id):
+<<<<<<< HEAD
     """
     Aprova a matrícula de um aluno para o professor logado.
 
     Muda o status da relação na tabela Matricula para is_approved=True,
     permitindo que o aluno visualize o conteúdo deste professor.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     aluno = get_object_or_404(Aluno, id=aluno_id)
     professor_logado = request.user.professor_profile
 
@@ -187,11 +199,14 @@ def aprovar_aluno(request, aluno_id):
 
 @login_required
 def lista_alunos_professor(request):
+<<<<<<< HEAD
     """
     Exibe a listagem de todos os alunos vinculados e aprovados do professor logado.
 
     Utiliza select_related para otimizar a consulta ao banco de dados.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     professor = request.user.professor_profile
     from .models import Matricula  # Garanta que o import está aqui
 
@@ -208,12 +223,15 @@ def lista_alunos_professor(request):
 
 @login_required
 def editar_perfil(request):
+<<<<<<< HEAD
     """
     Gerencia a atualização dos dados cadastrais e fotos de perfil.
 
     Identifica automaticamente o tipo de perfil (Aluno ou Professor)
     e carrega os formulários correspondentes.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # Identifica qual é o perfil do usuário logado
     if hasattr(request.user, 'professor_profile'):
         perfil = request.user.professor_profile
@@ -246,11 +264,14 @@ def editar_perfil(request):
 
 @login_required
 def marcar_notificacoes_lidas(request):
+<<<<<<< HEAD
     """
     Marca todas as notificações pendentes do usuário logado como lidas.
 
     Redireciona para a página anterior após a atualização.
     """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # Filtra todas as notificações do usuário logado que ainda não foram lidas e as marca como True
     Notificacao.objects.filter(user=request.user, lida=False).update(lida=True)
 
