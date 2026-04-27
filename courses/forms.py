@@ -2,6 +2,13 @@ from django import forms
 from .models import Licao
 
 class LicaoForm(forms.ModelForm):
+    """
+    Formulário para criação e edição de lições pedagógicas.
+
+    Este formulário mapeia os campos do modelo Licao e aplica classes
+    do Tailwind CSS diretamente nos widgets para garantir a consistência
+    visual da interface do professor sem a necessidade de estilização manual no HTML.
+    """
     class Meta:
         model = Licao
         fields = ['titulo', 'descricao', 'questoes', 'link_externo', 'arquivo']

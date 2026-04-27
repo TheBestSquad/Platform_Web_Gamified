@@ -4,6 +4,15 @@ from .models import Professor, Aluno
 
 
 class ProfessorRegistrationForm(forms.ModelForm):
+<<<<<<< HEAD
+    """
+    Formulário para cadastro inicial de Professores.
+
+    Combina campos de autenticação (User) com campos de perfil profissional.
+    Inclui validação de confirmação de senha.
+    """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # Campos do User
     first_name = forms.CharField(label="Nome Completo", max_length=150)
     email = forms.EmailField(label="E-mail")
@@ -15,6 +24,12 @@ class ProfessorRegistrationForm(forms.ModelForm):
         fields = ['formacao', 'contato', 'disciplina_curso', 'foto']
 
     def clean(self):
+<<<<<<< HEAD
+        """
+        Verifica se os campos de senha e confirmação de senha são idênticos.
+        """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
@@ -25,6 +40,15 @@ class ProfessorRegistrationForm(forms.ModelForm):
 
 
 class AlunoRegistrationForm(forms.ModelForm):
+<<<<<<< HEAD
+    """
+    Formulário para cadastro inicial de Alunos.
+
+    Permite que o aluno escolha múltiplos professores/matérias no ato do cadastro.
+    A relação ManyToMany é gerenciada através de um CheckboxSelectMultiple.
+    """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     # Campos do User
     first_name = forms.CharField(label="Nome Completo", max_length=150)
     email = forms.EmailField(label="E-mail")
@@ -44,6 +68,12 @@ class AlunoRegistrationForm(forms.ModelForm):
         fields = ['contato', 'professores', 'foto']
 
     def clean(self):
+<<<<<<< HEAD
+        """
+        Valida a integridade das senhas fornecidas pelo aluno.
+        """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
@@ -55,18 +85,36 @@ class AlunoRegistrationForm(forms.ModelForm):
 
 # Formulário para dados básicos do User
 class UserUpdateForm(forms.ModelForm):
+<<<<<<< HEAD
+    """
+    Formulário para atualização de dados de autenticação comuns a qualquer usuário.
+    """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
 
 # Formulário para dados extras do Professor
 class ProfessorUpdateForm(forms.ModelForm):
+<<<<<<< HEAD
+    """
+    Formulário para edição dos dados profissionais do Professor.
+    """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     class Meta:
         model = Professor
         fields = ['formacao', 'contato', 'disciplina_curso', 'foto']
 
 # Formulário para dados extras do Aluno
 class AlunoUpdateForm(forms.ModelForm):
+<<<<<<< HEAD
+    """
+    Formulário para edição dos dados de contato e foto do Aluno.
+    """
+=======
+>>>>>>> 25e2af42ce260e5c0305aadbfbd126686def07fb
     class Meta:
         model = Aluno
         fields = ['contato', 'foto']
