@@ -36,11 +36,11 @@ curl -fsSL https://get.docker.com -o get-docker.sh \
 
 Clone o repositório:
 ```bash
-git clone https://github.com/leobrda/projetoIntegrador_I.git
+git clone https://github.com/TheBestSquad/Platform_Web_Gamified.git
 ```
 Entre no diretório da aplicação:
 ```bash
-cd projetoIntegrador_I
+cd Platform_Web_Gamified
 ```
 Construa e execute a aplicação:
 ```bash
@@ -64,11 +64,11 @@ Para encerrar a aplicação pressione CTRL+C no terminal da aplicação.
 
 Clone o repositório:
 ```bash
-git clone https://github.com/leobrda/projetoIntegrador_I.git
+git clone https://github.com/TheBestSquad/Platform_Web_Gamified.git
 ```
 Entre no diretório da aplicação:
 ```bash
-cd projetoIntegrador_I
+cd Platform_Web_Gamified
 ```
 Crie o arquivo .env com a seleção do ambiente e os parâmetros do banco de dados:
 ```bash
