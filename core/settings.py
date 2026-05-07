@@ -10,27 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
 import os
-from dotenv import load_dotenv
+import environ
+from pathlib import Path
 
-load_dotenv()
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    DJANGO_ENV=(str, 'development'),
+    SECRET_KEY=(str, 'django-insecure-%%+hljgor=&v85q60%=75)k+gnw#y&%9axuf*z@k0*7s9w#6zj'),
+    ALLOWED_HOSTS=(list, ['*'])
+)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.isfile(env_file):
+    environ.Env.read_env(env_file)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1(rpdimrjtkuur-iv24*kiqx)b28uh2w6t_q7wuxzd9%g5)l(+'
+DJANGO_ENV = env('DJANGO_ENV')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Segurança dinâmica: DEBUG é True apenas em desenvolvimento
+DEBUG = env.bool('DEBUG', default=(DJANGO_ENV == 'development'))
 
-ALLOWED_HOSTS = []
-
+SECRET_KEY = env('SECRET_KEY')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
 # Application definition
 
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -57,6 +60,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 TEMPLATES = [
     {
@@ -80,13 +85,23 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# ------------------------------------------------------------------------
+# LÓGICA DE BANCO DE DADOS POR AMBIENTE
+# ------------------------------------------------------------------------
+if DJANGO_ENV == 'development':
+    # Força o SQLite local e ignora a DATABASE_URL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-
+else:
+    # Staging e Production exigem a variável DATABASE_URL (MySQL)
+    DATABASES = {
+        'default': env.db('DATABASE_URL')
+    }
+# ------------------------------------------------------------------------
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -124,9 +139,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = '/media;/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = '/'  # Depois vamos criar uma Home decente
@@ -136,9 +152,15 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 # Configurações de E-mail (Outlook)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp-mail.outlook.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp-mail.outlook.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = 'Plataforma Escolar <projetointegradorunivesp2026@outlook.com>'
+
+# ------------------------------------------------------------------------
+# SEGURANÇA / CSRF (necessário para o Docker)
+# ------------------------------------------------------------------------
+# Necessário quando o Django roda em Docker/Proxy e as portas de origem/destino divergem
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']

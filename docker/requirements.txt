@@ -4,4 +4,6 @@ sqlparse==0.5.5
 tzdata==2026.1
 Pillow==10.3.0
 django-environ>=0.13,<1.0
+gunicorn>=25.0,<26.0
 whitenoise>=6.0,<7.0
+mysqlclient>=2.2,<3.0
