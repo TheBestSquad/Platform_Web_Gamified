@@ -1,57 +1,109 @@
 {% extends 'base.html' %}
 
-{% block title %}Cadastro de Professor{% endblock %}
+{% block title %}Cadastro de Professor - EduDash{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-    <div class="py-4 px-6 bg-green-600 text-white text-center font-bold text-xl">
-        Cadastro de Docente
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-2xl">
+
+        {# Header #}
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-600 rounded-3xl shadow-2xl mb-4 -rotate-3">
+                <span class="text-4xl">👨‍🏫</span>
+            </div>
+            <h1 class="text-4xl font-black text-slate-800 uppercase italic tracking-tighter">EduDash</h1>
+            <p class="text-slate-400 font-semibold text-sm mt-1 uppercase tracking-widest">Cadastro de Docente</p>
+        </div>
+
+        {# Card #}
+        <div class="bg-white rounded-3xl shadow-2xl border-2 border-slate-100 overflow-hidden">
+
+            {# Faixa topo #}
+            <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-6">
+                <h2 class="text-2xl font-black text-white uppercase italic tracking-tight">Crie sua conta 🚀</h2>
+                <p class="text-emerald-200 text-xs font-semibold mt-1 uppercase tracking-widest">Preencha os dados para se cadastrar</p>
+            </div>
+
+            <form method="POST" class="px-8 py-8 space-y-6">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="flex items-center gap-3 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-bold">
+                        <span class="text-lg">⚠️</span> Corrija os erros abaixo e tente novamente.
+                    </div>
+                {% endif %}
+
+                {# Seção: Dados Pessoais #}
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">📋 Dados Pessoais</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Nome Completo</label>
+                            <input type="text" name="first_name" required placeholder="Ex: João da Silva"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">E-mail</label>
+                            <input type="email" name="email" required placeholder="seu@email.com"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+
+                {# Seção: Dados Profissionais #}
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">🎓 Dados Profissionais</p>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Formação Acadêmica</label>
+                        <input type="text" name="formacao" required placeholder="Ex: Mestre em Ciências da Computação"
+                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Contato (WhatsApp)</label>
+                            <input type="text" name="contato" required placeholder="(00) 00000-0000"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Disciplina / Curso</label>
+                            <input type="text" name="disciplina_curso" required placeholder="Ex: Algoritmos e Lógica"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+
+                {# Seção: Senha #}
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">🔑 Segurança</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Senha</label>
+                            <input type="password" name="password" required placeholder="••••••••"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Confirmar Senha</label>
+                            <input type="password" name="confirm_password" required placeholder="••••••••"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-emerald-500 focus:bg-white transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-lg transition-all duration-200 uppercase tracking-widest text-sm">
+                    Finalizar Cadastro ✅
+                </button>
+            </form>
+
+            {# Rodapé #}
+            <div class="bg-slate-50 border-t-2 border-slate-100 px-8 py-5 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Já tem uma conta?</p>
+                <a href="{% url 'login' %}" class="text-emerald-600 hover:text-emerald-800 font-black text-sm transition">
+                    ← Voltar para o Login
+                </a>
+            </div>
+
+        </div>
     </div>
-
-    <form method="POST" class="p-6 space-y-4">
-        {% csrf_token %}
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Nome Completo</label>
-                <input type="text" name="first_name" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">E-mail</label>
-                <input type="email" name="email" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-            </div>
-        </div>
-
-        <div>
-            <label class="block text-gray-700 font-semibold mb-1">Formação Acadêmica</label>
-            <input type="text" name="formacao" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Contato (WhatsApp)</label>
-                <input type="text" name="contato" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Disciplina / Curso</label>
-                <input type="text" name="disciplina_curso" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Senha</label>
-                <input type="password" name="password" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Confirmar Senha</label>
-                <input type="password" name="confirm_password" required class="w-full border rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
-            </div>
-        </div>
-
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
-            Finalizar Cadastro do Professor
-        </button>
-    </form>
 </div>
 {% endblock %}
