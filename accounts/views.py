@@ -245,6 +245,46 @@ def editar_perfil(request):
 
 
 @login_required
+def gerenciar_professores(request):
+    """
+    Permite que o aluno visualize os professores que já possui vínculo
+    (aprovados ou pendentes) e solicite matrícula em novos professores.
+    """
+    # Apenas alunos podem acessar esta página
+    if not hasattr(request.user, 'aluno_profile'):
+        return redirect('home')
+
+    aluno = request.user.aluno_profile
+
+    if request.method == 'POST':
+        professor_id = request.POST.get('professor_id')
+        professor = get_object_or_404(Professor, id=professor_id)
+
+        # Cria a matrícula somente se ainda não existir
+        matricula, criada = Matricula.objects.get_or_create(aluno=aluno, professor=professor)
+        if criada:
+            messages.success(request, f'Solicitação enviada para {professor.user.get_full_name()}! Aguarde a aprovação.')
+        else:
+            messages.info(request, f'Você já possui vínculo com {professor.user.get_full_name()}.')
+
+        return redirect('gerenciar_professores')
+
+    # IDs dos professores que o aluno já tem vínculo (qualquer status)
+    ids_vinculados = Matricula.objects.filter(aluno=aluno).values_list('professor_id', flat=True)
+
+    # Matrículas atuais do aluno com detalhes
+    minhas_matriculas = Matricula.objects.filter(aluno=aluno).select_related('professor__user')
+
+    # Professores disponíveis (sem vínculo ainda)
+    professores_disponiveis = Professor.objects.exclude(id__in=ids_vinculados).select_related('user')
+
+    return render(request, 'accounts/gerenciar_professores.html', {
+        'minhas_matriculas': minhas_matriculas,
+        'professores_disponiveis': professores_disponiveis,
+    })
+
+
+@login_required
 def marcar_notificacoes_lidas(request):
     """
     Marca todas as notificações pendentes do usuário logado como lidas.

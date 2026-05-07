@@ -9,4 +9,5 @@ urlpatterns = [
     path('meus-alunos/', views.lista_alunos_professor, name='lista_alunos'),
     path('perfil/', views.editar_perfil, name='editar_perfil'),
     path('notificacoes/lidas/', views.marcar_notificacoes_lidas, name='marcar_notificacoes_lidas'),
+    path('meus-professores/', views.gerenciar_professores, name='gerenciar_professores'),
 ]
