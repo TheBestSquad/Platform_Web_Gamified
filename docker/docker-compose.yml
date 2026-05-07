@@ -1,0 +1,41 @@
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: ../.env
+        required: false
+    depends_on:
+      db:
+        condition: service_healthy
+        required: false
+
+  db:
+    image: mysql:8.0
+    profiles:
+      - mysql
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-senha_root_padrao}
+      MYSQL_DATABASE: ${DB_NAME:-gamification}
+      MYSQL_USER: ${DB_USER:-gamification_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-senha_app_padrao}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-senha_root_padrao}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:

@@ -24,11 +24,11 @@ sudo apt-get update && sudo apt-get install git python-is-python3 python3-dev py
 ```
 Clone o repositório:
 ```bash
-git clone https://github.com/TheBestSquad/Platform_Web_Gamified.git
+git clone https://github.com/leobrda/projetoIntegrador_I.git
 ```
 Entre no diretório da aplicação:
 ```bash
-cd Platform_Web_Gamified
+cd projetoIntegrador_I
 ```
 Crie um ambiente do python isolado:
 ```bash
