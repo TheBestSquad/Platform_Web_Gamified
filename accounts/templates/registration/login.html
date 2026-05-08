@@ -1,49 +1,87 @@
 {% extends 'base.html' %}
 
-{% block title %}Login - Plataforma{% endblock %}
+{% block title %}Login - EduDash{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
-    <div class="py-4 px-6 bg-blue-600">
-        <h2 class="text-2xl font-bold text-white text-center">Acesse sua Conta</h2>
-    </div>
+<div class="min-h-[80vh] flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
 
-    <form method="post" class="py-4 px-6">
-        {% csrf_token %}
-
-        {% if form.errors %}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                E-mail ou senha incorretos.
+        {# Logo / Header #}
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-3xl shadow-2xl mb-4 rotate-3">
+                <span class="text-4xl">🎓</span>
             </div>
-        {% endif %}
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="username">E-mail (Username)</label>
-            <input name="username" id="username" type="text" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <h1 class="text-4xl font-black text-slate-800 uppercase italic tracking-tighter">EduDash</h1>
+            <p class="text-slate-400 font-semibold text-sm mt-1 uppercase tracking-widest">Plataforma de Aprendizado</p>
         </div>
 
-        <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Senha</label>
-            <input name="password" id="password" type="password" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+        {# Card Principal #}
+        <div class="bg-white rounded-3xl shadow-2xl border-2 border-slate-100 overflow-hidden">
+
+            {# Faixa topo #}
+            <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-6">
+                <h2 class="text-2xl font-black text-white uppercase italic tracking-tight">Bem-vindo de volta! 👋</h2>
+                <p class="text-blue-200 text-xs font-semibold mt-1 uppercase tracking-widest">Acesse sua conta para continuar</p>
+            </div>
+
+            <form method="post" class="px-8 py-8 space-y-5">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="flex items-center gap-3 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-bold">
+                        <span class="text-lg">⚠️</span> E-mail ou senha incorretos. Tente novamente.
+                    </div>
+                {% endif %}
+
+                {# Campo E-mail #}
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest" for="username">
+                        📧 E-mail
+                    </label>
+                    <input name="username" id="username" type="text" required placeholder="seu@email.com"
+                        class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                </div>
+
+                {# Campo Senha #}
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest" for="password">
+                        🔑 Senha
+                    </label>
+                    <input name="password" id="password" type="password" required placeholder="••••••••"
+                        class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                </div>
+
+                {# Esqueceu a senha #}
+                <div class="text-right">
+                    <a href="{% url 'password_reset' %}" class="text-xs font-bold text-blue-500 hover:text-blue-700 transition">
+                        Esqueceu a senha?
+                    </a>
+                </div>
+
+                {# Botão Entrar #}
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-lg transition-all duration-200 uppercase tracking-widest text-sm">
+                    Entrar 🚀
+                </button>
+            </form>
+
+            {# Rodapé do card #}
+            <div class="bg-slate-50 border-t-2 border-slate-100 px-8 py-6 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Ainda não tem conta?</p>
+                <div class="flex gap-3 justify-center">
+                    <a href="{% url 'register_professor' %}"
+                       class="flex-1 bg-white border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-black text-xs py-3 px-4 rounded-2xl transition-all duration-200 uppercase tracking-wide">
+                        👨‍🏫 Sou Professor
+                    </a>
+                    <a href="{% url 'register_aluno' %}"
+                       class="flex-1 bg-white border-2 border-slate-200 hover:border-green-400 hover:bg-green-50 text-slate-700 hover:text-green-700 font-black text-xs py-3 px-4 rounded-2xl transition-all duration-200 uppercase tracking-wide">
+                        🎒 Sou Aluno
+                    </a>
+                </div>
+            </div>
+
         </div>
 
-        <div class="flex items-center justify-between">
-            <button type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300">
-                Entrar
-            </button>
-        </div>
-    </form>
-
-    <div class="bg-gray-50 py-4 px-6 border-t border-gray-100 text-center">
-        <p class="text-sm text-gray-600">Ainda não tem conta?</p>
-        <div class="mt-2 space-x-2">
-            <a href="{% url 'register_professor' %}" class="text-blue-600 hover:underline font-semibold">Sou Professor</a>
-            <span class="text-gray-300">|</span>
-            <a href="{% url 'register_aluno' %}" class="text-blue-600 hover:underline font-semibold">Sou Aluno</a>
-        </div>
     </div>
 </div>
 {% endblock %}

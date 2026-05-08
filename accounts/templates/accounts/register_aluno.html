@@ -1,108 +1,112 @@
 {% extends 'base.html' %}
 
-{% block title %}Cadastro de Aluno{% endblock %}
+{% block title %}Cadastro de Aluno - EduDash{% endblock %}
 
 {% block content %}
-<style>
-    /* Estilização moderna para as checkboxes */
-    .custom-checkbox-list ul {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 0.75rem;
-        padding: 0;
-        margin: 0;
-    }
-    .custom-checkbox-list li {
-        display: flex;
-        align-items: center;
-        background: white;
-        border: 2px solid #f1f5f9;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-    .custom-checkbox-list li:hover {
-        border-color: #3b82f6;
-        background-color: #eff6ff;
-    }
-    .custom-checkbox-list input[type="checkbox"] {
-        width: 1.1rem;
-        height: 1.1rem;
-        margin-right: 0.75rem;
-        cursor: pointer;
-        accent-color: #2563eb;
-    }
-    .custom-checkbox-list label {
-        font-size: 0.875rem;
-        font-weight: 700;
-        color: #1e293b;
-        cursor: pointer;
-        width: 100%;
-    }
-    /* Esconde as bolinhas da lista padrão do Django */
-    .custom-checkbox-list ul { list-style: none; }
-</style>
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-2xl">
 
-<div class="max-w-2xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden mt-10 border-2 border-slate-100">
-    <div class="py-6 px-6 bg-blue-600 text-white text-center">
-        <h2 class="font-black text-2xl uppercase italic tracking-tighter">Cadastro de Aluno</h2>
-    </div>
-
-    <form method="POST" class="p-8 space-y-6">
-        {% csrf_token %}
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-1">
-                <label class="block text-xs font-black text-slate-500 uppercase ml-1">Nome Completo</label>
-                <input type="text" name="first_name" required
-                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
+        {# Header #}
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-3xl shadow-2xl mb-4 rotate-3">
+                <span class="text-4xl">🎒</span>
             </div>
-            <div class="space-y-1">
-                <label class="block text-xs font-black text-slate-500 uppercase ml-1">E-mail</label>
-                <input type="email" name="email" required
-                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
-            </div>
+            <h1 class="text-4xl font-black text-slate-800 uppercase italic tracking-tighter">EduDash</h1>
+            <p class="text-slate-400 font-semibold text-sm mt-1 uppercase tracking-widest">Cadastro de Aluno</p>
         </div>
 
-        <div class="space-y-1">
-            <label class="block text-xs font-black text-slate-500 uppercase ml-1">Contato (WhatsApp)</label>
-            <input type="text" name="contato" required
-                class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50"
-                placeholder="(00) 00000-0000">
-        </div>
+        {# Card #}
+        <div class="bg-white rounded-3xl shadow-2xl border-2 border-slate-100 overflow-hidden">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-            <div class="space-y-1">
-                <label class="block text-xs font-black text-slate-500 uppercase ml-1">Senha</label>
-                <input type="password" name="password" required
-                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
+            {# Faixa topo #}
+            <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-6">
+                <h2 class="text-2xl font-black text-white uppercase italic tracking-tight">Crie sua conta 🚀</h2>
+                <p class="text-blue-200 text-xs font-semibold mt-1 uppercase tracking-widest">Preencha os dados para se cadastrar</p>
             </div>
-            <div class="space-y-1">
-                <label class="block text-xs font-black text-slate-500 uppercase ml-1">Confirmar Senha</label>
-                <input type="password" name="confirm_password" required
-                    class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-blue-500 outline-none transition bg-slate-50">
-            </div>
-        </div>
 
-        <div class="pt-4 border-t border-slate-100">
-            <label class="block text-xs font-black text-blue-600 uppercase mb-3 tracking-widest text-center">
-                Selecione seus Professores / Matérias
-            </label>
-            <div class="p-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 max-h-60 overflow-y-auto">
-                <div class="custom-checkbox-list">
-                    {{ form.professores }}
+            <form method="POST" class="px-8 py-8 space-y-6">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="flex items-center gap-3 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-bold">
+                        <span class="text-lg">⚠️</span> Corrija os erros abaixo e tente novamente.
+                    </div>
+                {% endif %}
+
+                {# Seção: Dados Pessoais #}
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">📋 Dados Pessoais</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Nome Completo</label>
+                            <input type="text" name="first_name" required placeholder="Ex: Maria Souza"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">E-mail</label>
+                            <input type="email" name="email" required placeholder="seu@email.com"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Contato (WhatsApp)</label>
+                        <input type="text" name="contato" required placeholder="(00) 00000-0000"
+                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                    </div>
                 </div>
-            </div>
-            {% if form.professores.errors %}
-                <p class="text-red-500 text-[10px] font-bold mt-2 text-center">{{ form.professores.errors.0 }}</p>
-            {% endif %}
-        </div>
 
-        <button type="submit"
-            class="w-full bg-blue-600 hover:bg-black text-white font-black py-4 rounded-2xl transition duration-300 shadow-xl uppercase tracking-widest transform active:scale-95">
-            Finalizar Cadastro de Aluno
-        </button>
-    </form>
+                {# Seção: Senha #}
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">🔑 Segurança</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Senha</label>
+                            <input type="password" name="password" required placeholder="••••••••"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Confirmar Senha</label>
+                            <input type="password" name="confirm_password" required placeholder="••••••••"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-slate-800 font-semibold text-sm placeholder-slate-300 outline-none focus:border-blue-500 focus:bg-white transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+
+                {# Seção: Professores #}
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">👨‍🏫 Selecione seus Professores</p>
+                    <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 max-h-60 overflow-y-auto">
+                        <style>
+                            .custom-checkbox-list ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; }
+                            .custom-checkbox-list li { display: flex; align-items: center; background: white; border: 2px solid #f1f5f9; border-radius: 0.75rem; padding: 0.65rem 1rem; transition: all 0.2s; cursor: pointer; }
+                            .custom-checkbox-list li:hover { border-color: #3b82f6; background-color: #eff6ff; }
+                            .custom-checkbox-list input[type="checkbox"] { width: 1.1rem; height: 1.1rem; margin-right: 0.65rem; cursor: pointer; accent-color: #2563eb; flex-shrink: 0; }
+                            .custom-checkbox-list label { font-size: 0.8rem; font-weight: 700; color: #1e293b; cursor: pointer; }
+                        </style>
+                        <div class="custom-checkbox-list">
+                            {{ form.professores }}
+                        </div>
+                    </div>
+                    {% if form.professores.errors %}
+                        <p class="text-red-500 text-[10px] font-bold mt-1">⚠️ {{ form.professores.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-lg transition-all duration-200 uppercase tracking-widest text-sm">
+                    Finalizar Cadastro ✅
+                </button>
+            </form>
+
+            {# Rodapé #}
+            <div class="bg-slate-50 border-t-2 border-slate-100 px-8 py-5 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Já tem uma conta?</p>
+                <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800 font-black text-sm transition">
+                    ← Voltar para o Login
+                </a>
+            </div>
+
+        </div>
+    </div>
 </div>
 {% endblock %}
