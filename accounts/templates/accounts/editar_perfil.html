@@ -53,6 +53,13 @@
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transition uppercase tracking-widest active:scale-95">
                 Salvar Alterações
             </button>
+
+            {% if user.aluno_profile %}
+            <a href="{% url 'gerenciar_professores' %}"
+               class="mt-2 w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black py-4 rounded-xl shadow transition uppercase tracking-widest active:scale-95 text-sm">
+                👨‍🏫 Gerenciar Meus Professores
+            </a>
+            {% endif %}
         </div>
     </form>
 </div>

@@ -67,15 +67,16 @@ class Entrega(models.Model):
         if not self.pk:
             # Define o XP fixo baseado na tentativa no momento do envio
             if self.tentativa_numero == 1:
+                self.xp = 15
+            elif self.tentativa_numero == 2:
                 self.xp = 10
             else:
-                self.xp = 15
+                self.xp = 5
 
         # Se o professor marcar que acertou, garantimos que a nota seja 10 (opcional, mas ajuda)
         if self.acertou:
             self.nota = 10.00
-            if self.xp < 15:
-                self.xp = 15
+            self.xp += 15
 
         super().save(*args, **kwargs)
 
