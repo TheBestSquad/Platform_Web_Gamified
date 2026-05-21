@@ -2,7 +2,7 @@
 ## Plataforma Gamificada web para o de ensino de informática
 
 ### 📝 Sobre o Projeto
-Este projeto consiste no desenvolvimento de uma plataforma web gamificada focada no ensino de ensino de informática (14+ anos). A plataforma utiliza elementos de jogos (XP, conquistas e níveis) para tornar o aprendizado de ensino de informática mais envolvente e intuitivo.
+Este projeto consiste no desenvolvimento de uma plataforma web gamificada focada no ensino de informática (14+ anos). A plataforma utiliza elementos de jogos (XP, conquistas e níveis) para tornar o aprendizado de ensino de informática mais envolvente e intuitivo.
 
 ### 🛠️ Tecnologias Utilizadas
 * **Linguagem:** Python 3.12
